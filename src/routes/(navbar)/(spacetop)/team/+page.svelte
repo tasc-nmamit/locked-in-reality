@@ -1,13 +1,12 @@
 <script lang="ts">
 	import CreateTeam from '$lib/components/Hackathon/CreateTeam.svelte';
 	import JoinTeam from '$lib/components/Hackathon/JoinTeam.svelte';
-	import { Button } from '$lib/components/ui/button';
-	import { user, userData, userLoaded, userProfileData } from '$lib/firebase/firebase';
-	import { copy } from 'svelte-copy';
 	import LeaveTeam from '$lib/components/Hackathon/LeaveTeam.svelte';
-	import { doc, getDoc } from 'firebase/firestore';
-	import { db } from '$lib/firebase/firebase';
+	import { Button } from '$lib/components/ui/button';
+	import { db, user, userData, userLoaded, userProfileData } from '$lib/firebase/firebase';
 	import type { TeamData } from '$lib/types/TeamData';
+	import { doc, getDoc } from 'firebase/firestore';
+	import { copy } from 'svelte-copy';
 
 	let data: TeamData | null = null;
 
@@ -106,6 +105,6 @@
 {:else}
 	<div class="flex h-full min-h-screen w-full flex-col items-center justify-center">
 		<h2 class="font-jbExtrabold pb-6 pt-4 text-4xl">You need to be logged in to view/join a team!</h2>
-		<a href="/lir"><Button>Goto Home page, refresh the page and Login</Button></a>
+		<a href="/"><Button>Goto Home page, refresh the page and Login</Button></a>
 	</div>
 {/if}

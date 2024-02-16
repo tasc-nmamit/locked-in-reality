@@ -22,7 +22,7 @@
 		<p class="text-xl">Can you compete with the superior species!<br /><span class="font-bold text-brand dark:text-primary">Made with love by Dept. of AIML</span></p>
 	</div>
 
-	<div class="absolute bottom-10 hidden w-full animate-bounce items-center justify-center bg-transparent md:flex">
+	<!-- <div class="absolute bottom-10 hidden w-full animate-bounce items-center justify-center bg-transparent md:flex">
 		<a href="/#about">
 			<svg width="50" height="50" viewBox="0 0 74 74" fill="none" xmlns="http://www.w3.org/2000/svg" class="hidden dark:block">
 				<path d="M65.2726 18.5L69.375 22.1445L37 55.5L4.625 22.1445L8.72738 18.5L37 47.6283L65.2726 18.5Z" fill="white" />
@@ -31,7 +31,7 @@
 				<path d="M65.2726 18.5L69.375 22.1445L37 55.5L4.625 22.1445L8.72738 18.5L37 47.6283L65.2726 18.5Z" fill="black" />
 			</svg>
 		</a>
-	</div>
+	</div> -->
 
 	<div class="flex min-h-[100dvh] flex-grow flex-col md:hidden">
 		<div class="z-0 flex flex-col">
