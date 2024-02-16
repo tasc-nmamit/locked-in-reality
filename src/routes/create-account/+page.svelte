@@ -23,6 +23,7 @@
 
 	const reUsername = /^(?=[a-z0-9._]{3,16}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
 	const reName = /(^[a-zA-Z][a-zA-Z\s]{0,48}[a-zA-Z]$)/;
+	const reUSN = /^[A-Z0-9]*$/;
 	const rePhone = /^[0-9]{10}$/;
 
 	$: isValidPhone = phone?.length === 10 && rePhone.test(phone);
@@ -30,6 +31,9 @@
 
 	$: isValidName = name?.length > 4 && name.length < 48 && reName.test(name);
 	$: isTouchedName = name.length >= 1;
+
+	$: isValidUSN = usn?.length > 1 && usn.length < 15 && reUSN.test(usn);
+	$: isTouchedUSN = usn.length >= 1;
 
 	$: isValidUsername = username?.length > 2 && username.length < 16 && reUsername.test(username);
 	$: isTouchedUsername = username.length >= 1;
@@ -65,7 +69,7 @@
 	}
 
 	async function createAccount() {
-		if (isValidName && isValidUsername) {
+		if (isValidName && isValidUSN && isValidUsername) {
 			console.log('confirming username', username);
 
 			const batch = writeBatch(db);
@@ -74,9 +78,8 @@
 			const newUserRef = doc(collection(db, 'user'));
 			batch.set(newUserRef, {
 				username: username,
-				email: $user?.providerData[0].email,
 				name: name,
-				isDoctor: false,
+				usn: usn,
 				createdAt: new Date().toISOString()
 			});
 
@@ -86,21 +89,15 @@
 			// Username is unique, so we are using it as the document id
 			batch.set(doc(db, 'usernames', username), { user: newUserRef.id });
 
-			// Create temporary profile
+			// Create temporary user profile
 			batch.set(doc(db, 'profile', newUserRef.id), {
 				name: name,
+				usn: usn,
+				phone: isValidPhone ? phone : '',
 				username: username,
 				photoURL: $user!.photoURL,
 				bio: 'Hello! I am ' + name + '.',
 				createdAt: new Date().toISOString()
-			});
-
-			// Create temporary private profile
-			batch.set(doc(db, 'private', newUserRef.id), {
-				name: name,
-				phone: isValidPhone ? phone : '',
-				email: $user?.providerData[0].email,
-				username: username
 			});
 
 			await batch.commit();
@@ -127,7 +124,7 @@
 				<Card.Header class="space-y-1">
 					<Card.Title class="text-3xl">Enter your details</Card.Title>
 					<h2 class="card-title">Welcome, {$user.displayName}</h2>
-					<Card.Description>You have successfully signed in. Now you can enter your details. Make sure to enter all your details correctly.</Card.Description>
+					<Card.Description>You have successfully signed in. Now you can enter your details. Make sure to enter all your details correctly. Some of these details like your name cannot be changed later unless you contact the admins.</Card.Description>
 				</Card.Header>
 
 				<form on:submit|preventDefault={createAccount}>
@@ -135,10 +132,22 @@
 						<div>
 							<Label class="text-xl" for="name">Name</Label>
 							<Input type="text" id="name" placeholder="Enter your full name" bind:value={name} class={!isValidName && isTouchedName ? 'bg-red-200 dark:bg-red-900' : ''} required />
+							<p class="mt-1 text-sm text-muted-foreground">This is the name that will appear on your certificates.</p>
 							{#if isTouchedName && !isValidName}
 								<div>
 									<p>The name you have entered is invalid.</p>
 									<p class="text-sm text-muted-foreground">Your name must begin with a Capital letter and shouldn't begin or end with a space.</p>
+								</div>
+							{/if}
+						</div>
+
+						<div class="mt-6">
+							<Label class="text-xl" for="usn">USN</Label>
+							<Input type="text" id="usn" placeholder="Enter your college USN" bind:value={usn} class={!isValidUSN && isTouchedUSN ? 'bg-red-200 dark:bg-red-900' : ''} required />
+							{#if isTouchedUSN && !isValidUSN}
+								<div class="mb-2">
+									<p>USN should contain only numbers and CAPITAL letters.</p>
+									<p class="text-sm text-muted-foreground">USN must be 2-14 characters long and alphanumeric (CAPITAL letters only)</p>
 								</div>
 							{/if}
 						</div>
@@ -172,8 +181,8 @@
 						</div>
 
 						<div class="mt-6">
-							<Label for="phone" class="mt-10 text-xl">Phone Number</Label>
-							<Input type="text" class="{!isValidPhone && isTouchedPhone ? 'bg-red-200 dark:bg-red-900' : ''} {isValidPhone ? 'bg-green-300 dark:bg-green-800' : ''}" id="phone" placeholder="Enter your Phone Number" bind:value={phone} required />
+							<Label for="whatsapp" class="mt-10 text-xl">Phone Number</Label>
+							<Input type="text" class="{!isValidPhone && isTouchedPhone ? 'bg-red-200 dark:bg-red-900' : ''} {isValidPhone ? 'bg-green-300 dark:bg-green-800' : ''}" id="usn" placeholder="Enter your WhatsApp Phone Number" bind:value={phone} required />
 
 							{#if isTouchedPhone && !isValidPhone}
 								<div>
@@ -181,7 +190,8 @@
 								</div>
 							{/if}
 
-							<p class="mt-1 text-sm text-muted-foreground">You can also change the number in your account settings.</p>
+							<p class="mt-1 text-sm text-muted-foreground">We will use this number to contact you if necessary.</p>
+							<p class="mt-1 text-sm text-muted-foreground">You can also change this number in your account settings.</p>
 						</div>
 					</Card.Content>
 
