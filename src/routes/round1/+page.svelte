@@ -1,11 +1,10 @@
 <script lang="ts">
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import Input from '$lib/components/ui/input/input.svelte';
-	import { user, userData } from '$lib/firebase/firebase';
-	import Icon from '@iconify/svelte';
-	import { onMount } from 'svelte';
-	import type { PageData } from './$types';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import { db, user, userData, userProfileData } from '$lib/firebase/firebase';
+	import Icon from '@iconify/svelte';
+	import type { PageData } from './$types';
 
 	export let data: PageData;
 
@@ -25,8 +24,9 @@
 	}
 
 	import CharInput from '$lib/components/LIR/SpecialInput.svelte';
+	import { success } from '$lib/components/Toast/toast';
 	import { redirect } from '@sveltejs/kit';
-	import { toast } from '@zerodevx/svelte-toast';
+	import { doc, getDoc, writeBatch } from 'firebase/firestore';
 
 	let otpValue = '';
 	//@ts-expect-error
@@ -44,11 +44,21 @@
 		startTime = new Date().getTime();
 	}
 
-	function stopTimer() {
+	async function stopTimer() {
 		const endTime = new Date().getTime();
 		const timeDiff = endTime - startTime;
 		let seconds = Math.floor(timeDiff / 1000);
 		seconds += penaltyTime;
+		let teamURL = $userProfileData?.lir;
+		//@ts-ignore
+		const teamRef = doc(db, 'lir', teamURL);
+		const batch = writeBatch(db);
+		console.log(teamRef);
+		batch.update(teamRef, {
+			time: seconds
+		});
+		await batch.commit();
+		console.log(seconds);
 		alert(`You took ${seconds} seconds to complete the quiz!`);
 	}
 
@@ -88,129 +98,139 @@
 		hintView = true;
 		penaltyTime += 5;
 	}
+
+	function causeRedirect(path: string) {
+		redirect(300, path);
+	}
 </script>
 
-{#if !$user && !userData}
-	{redirect(300, '/login')}
-{/if}
-
-<section class={`h-screen w-full`}>
-	<!-- <p class="absolute top-0 z-50">{JSON.stringify(data)}</p> -->
-	<div class={`background`}></div>
-	{#if !isStarted}
-		<div class="z-20 mx-auto flex flex-col items-center justify-center gap-4">
-			<button
-				class="mx-auto rounded-md border-[1px] border-white px-4 py-2 backdrop-blur-lg duration-500 ease-in-out hover:scale-110"
-				on:click={() => {
-					isStarted = true;
-					startTimer();
-				}}>Start Quiz!</button
-			>
-			<p class="max-w-md text-center text-2xl font-bold">Once clicked the timer will start!</p>
-		</div>
-	{:else}
-		<div class="mx-auto flex w-full flex-col items-center gap-y-4">
-			<div class="relative z-10 flex min-w-[36rem] max-w-xl flex-col items-center gap-4 rounded-lg border-[1px] border-white bg-black/5 p-10 backdrop-blur-md">
-				<!-- hint alert dialog -->
-				<div class="z-20  ml-auto">
-					<AlertDialog.Root>
-						<AlertDialog.Trigger ><Icon icon="tabler:bulb"  style="color: white" class="w-8 h-8"/></AlertDialog.Trigger>
-						<AlertDialog.Content class="bg-black">
-							<AlertDialog.Header>
-
-								{#if data.list[currentQuestion].hint}
-									{#if hintSelected[currentQuestion] === false}
-										{#if hintView === false}
-											<div class="flex flex-row gap-4 items-center">
-												<Icon icon="noto:warning" class="w-10 h-10"/>
-												<AlertDialog.Title class="text-2xl">Attention</AlertDialog.Title>
-											</div>
-											<AlertDialog.Title class="text-lg">Do you want to use hint for this riddle?</AlertDialog.Title>
-											<AlertDialog.Description>The hint will be displayed once and a penalty of 5sec will be imposed</AlertDialog.Description>
-											<div class="w-full flex flex-row gap-2">
-												<AlertDialog.Cancel class="hover:bg-[#a527ff] basis-1/2">Close</AlertDialog.Cancel>
-												<Button class="basis-1/2 bg-[#621799] text-white hover:text-black" on:click={() => {hintView = true}}>this is button</Button>
-											</div>
+{#if !$userProfileData?.lir && !$userData && !user}
+	<div class="flex h-full min-h-screen w-full flex-col items-center justify-center">
+		<h2 class="font-jbExtrabold pb-6 pt-4 text-4xl">You need to login and create a team first!</h2>
+		<a href="/"><Button>Goto Homepage</Button></a>
+	</div>
+{:else}
+	<section class={`h-screen w-full`}>
+		<!-- <p class="absolute top-0 z-50">{JSON.stringify(data)}</p> -->
+		<div class={`background`}></div>
+		{#if !isStarted}
+			<div class="z-20 mx-auto flex flex-col items-center justify-center gap-4">
+				<button
+					class="mx-auto rounded-md border-[1px] border-white px-4 py-2 backdrop-blur-lg duration-500 ease-in-out hover:scale-110"
+					on:click={() => {
+						isStarted = true;
+						startTimer();
+					}}>Start Quiz!</button
+				>
+				<p class="max-w-md text-center text-2xl font-bold">Once clicked the timer will start!</p>
+			</div>
+		{:else}
+			<div class="mx-auto flex w-full flex-col items-center gap-y-4">
+				<div class="relative z-10 flex min-w-[36rem] max-w-xl flex-col items-center gap-4 rounded-lg border-[1px] border-white bg-black/5 p-10 backdrop-blur-md">
+					<!-- hint alert dialog -->
+					<div class="z-20 ml-auto">
+						<AlertDialog.Root>
+							<AlertDialog.Trigger><Icon icon="tabler:bulb" style="color: white" class="h-8 w-8" /></AlertDialog.Trigger>
+							<AlertDialog.Content class="bg-black">
+								<AlertDialog.Header>
+									{#if data.list[currentQuestion].hint}
+										{#if hintSelected[currentQuestion] === false}
+											{#if hintView === false}
+												<div class="flex flex-row items-center gap-4">
+													<Icon icon="noto:warning" class="h-10 w-10" />
+													<AlertDialog.Title class="text-2xl">Attention</AlertDialog.Title>
+												</div>
+												<AlertDialog.Title class="text-lg">Do you want to use hint for this riddle?</AlertDialog.Title>
+												<AlertDialog.Description>The hint will be displayed once and a penalty of 5sec will be imposed</AlertDialog.Description>
+												<div class="flex w-full flex-row gap-2">
+													<AlertDialog.Cancel class="basis-1/2 hover:bg-[#a527ff]">Close</AlertDialog.Cancel>
+													<Button
+														class="basis-1/2 text-black"
+														on:click={() => {
+															hintView = true;
+														}}>Use Hint</Button
+													>
+												</div>
+											{:else}
+												<div class="flex flex-row items-center gap-4">
+													<Icon icon="tabler:bulb" class="h-10 w-10" />
+													<AlertDialog.Title class="text-2xl">Hint</AlertDialog.Title>
+												</div>
+												<AlertDialog.Title class="text-lg">Hint: {data.list[currentQuestion].hint}</AlertDialog.Title>
+												<AlertDialog.Description>The hint will be displayed once</AlertDialog.Description>
+												<AlertDialog.Cancel class="hover:bg-[#a527ff]" on:click={handelGetHint}>Close</AlertDialog.Cancel>
+											{/if}
 										{:else}
-											<div class="flex flex-row gap-4 items-center">
-												<Icon icon="tabler:bulb" class="w-10 h-10"/>
-												<AlertDialog.Title class="text-2xl">Hint</AlertDialog.Title>
+											<div class="flex flex-row items-center gap-4">
+												<Icon icon="fxemoji:crossmark" class="h-10 w-10" />
+												<AlertDialog.Title class="text-2xl">Not Allowed</AlertDialog.Title>
 											</div>
-											<AlertDialog.Title class="text-lg">Hint: {data.list[currentQuestion].hint}</AlertDialog.Title>
-											<AlertDialog.Description>The hint will be displayed once</AlertDialog.Description>
-											<AlertDialog.Cancel class="hover:bg-[#a527ff]" on:click={handelGetHint}>Close</AlertDialog.Cancel>
+											<AlertDialog.Description>You have already used the hint</AlertDialog.Description>
+											<AlertDialog.Cancel class="hover:bg-[#a527ff]">Close</AlertDialog.Cancel>
 										{/if}
 									{:else}
-										<div class="flex flex-row gap-4 items-center">
-											<Icon icon="fxemoji:crossmark" class="w-10 h-10"/>
-											<AlertDialog.Title class="text-2xl">Not Allowed</AlertDialog.Title>
+										<div class="flex flex-row items-center gap-4">
+											<Icon icon="fxemoji:crossmark" class="h-8 w-8" />
+											<AlertDialog.Title>Sorry, No hint available for this question</AlertDialog.Title>
 										</div>
-										<AlertDialog.Description>You have already used the hint</AlertDialog.Description>
-										<AlertDialog.Cancel class="hover:bg-[#a527ff]">Close</AlertDialog.Cancel>
+										<AlertDialog.Cancel class="basis-1/2 hover:bg-[#a527ff]">Close</AlertDialog.Cancel>
 									{/if}
-								{:else}
-									<div class="flex flex-row gap-4 items-center">
-										<Icon icon="fxemoji:crossmark"  class="w-8 h-8"/>
-										<AlertDialog.Title>Sorry, No hint available for this question</AlertDialog.Title>
-									</div>
-									<AlertDialog.Cancel class="hover:bg-[#a527ff] basis-1/2">Close</AlertDialog.Cancel>
-								{/if}
+								</AlertDialog.Header>
+							</AlertDialog.Content>
+						</AlertDialog.Root>
+					</div>
+					<!-- hint alert dialog end -->
 
+					<h1 class="self-start text-left text-xl font-medium">
+						{currentQuestion + 1}. {data.list[currentQuestion].question}
+					</h1>
+					<Input type="text" placeholder="Type your answer" class="border-gray-500" bind:value={data.answers[currentQuestion].answer} on:input={handleInputChange} />
+					{#if data.answers[currentQuestion].answered}
+						{#if data.answers[currentQuestion].answer.toLowerCase().trim() === data.list[currentQuestion].answer.toLowerCase().trim()}
+							<p class="text-white">Decryption Code :{data.list[currentQuestion].key}</p>
+						{:else}
+							<p class="text-white">Error Wrong Code!</p>
+						{/if}
+					{/if}
+
+					<p>Questions Attempted: {questionCounter}/{data.list.length}</p>
+					<div class="flex flex-row flex-wrap items-center justify-center gap-3">
+						{#each { length: data.list.length } as _, i}
+							<button
+								class="btn w-8 {data.answers[i].answered && currentQuestion !== i ? 'btn-warning' : 'btn-outline'} {currentQuestion === i ? 'btn-active' : ''}"
+								on:click={() => {
+									currentQuestion = i;
+								}}>{i + 1}</button
+							>
+						{/each}
+					</div>
+					<div class="absolute bottom-2 flex w-full flex-row items-center justify-between gap-3 px-6">
+						<button class="" on:click={prevClick}><Icon icon="foundation:arrow-left" class="h-8 w-8" /></button>
+						<button class="" on:click={nextClick}><Icon icon="foundation:arrow-right" class="h-8 w-8" /></button>
+					</div>
+				</div>
+				<div class="z-20">
+					<AlertDialog.Root>
+						<AlertDialog.Trigger class="rounded-md border-[1px] border-white bg-transparent px-4 py-3 backdrop-blur-lg">Click to Decode</AlertDialog.Trigger>
+						<AlertDialog.Content class="bg-black/80">
+							<AlertDialog.Header>
+								<AlertDialog.Title>Enter the values here to Decode</AlertDialog.Title>
+								<AlertDialog.Description>Solve all the riddles to enter the final decoding value. <span class="font-bold text-purple-600">WARNING:</span> Wrong decoded value will add penalty to your final time!</AlertDialog.Description>
+								<AlertDialog.Description
+									><div class="mb-1">
+										<h2 class="mb-1 text-white">Enter the decryption code:</h2>
+										<CharInput on:match={checkMatch} />
+									</div></AlertDialog.Description
+								>
+								<AlertDialog.Cancel class="border-[.5px] border-white/30 hover:bg-[#a527ff]">Cancel</AlertDialog.Cancel>
 							</AlertDialog.Header>
 						</AlertDialog.Content>
 					</AlertDialog.Root>
 				</div>
-				<!-- hint alert dialog end -->
-
-				<h1 class="self-start text-left text-xl font-medium">
-					{currentQuestion + 1}. {data.list[currentQuestion].question}
-				</h1>
-				<Input type="text" placeholder="Type your answer" class="border-gray-500" bind:value={data.answers[currentQuestion].answer} on:input={handleInputChange} />
-				{#if data.answers[currentQuestion].answered}
-					{#if data.answers[currentQuestion].answer.toLowerCase().trim() === data.list[currentQuestion].answer.toLowerCase().trim()}
-						<p class="text-white">Decryption Code :{data.list[currentQuestion].key}</p>
-					{:else}
-						<p class="text-white">Error Wrong Code!</p>
-					{/if}
-				{/if}
-				
-				<p>Questions Attempted: {questionCounter}/{data.list.length}</p>
-				<div class="flex flex-row flex-wrap items-center justify-center gap-3">
-					{#each { length: data.list.length } as _, i}
-						<button
-							class="btn w-8 {data.answers[i].answered && currentQuestion !== i ? 'btn-warning' : 'btn-outline'} {currentQuestion === i ? 'btn-active' : ''}"
-							on:click={() => {
-								currentQuestion = i;
-							}}>{i + 1}</button
-						>
-					{/each}
-				</div>
-				<div class="absolute bottom-2 flex w-full flex-row items-center justify-between gap-3 px-6">
-					<button class="" on:click={prevClick}><Icon icon="foundation:arrow-left" class="h-8 w-8" /></button>
-					<button class="" on:click={nextClick}><Icon icon="foundation:arrow-right" class="h-8 w-8" /></button>
-				</div>
 			</div>
-			<div class="z-20">
-				<AlertDialog.Root>
-					<AlertDialog.Trigger class="rounded-md border-[1px] border-white bg-transparent px-4 py-3 backdrop-blur-lg">Click to Decode</AlertDialog.Trigger>
-					<AlertDialog.Content class="bg-black">
-						<AlertDialog.Header>
-							<AlertDialog.Title>Enter the values here to Decode</AlertDialog.Title>
-							<AlertDialog.Description>Solve all the riddles to enter the final decoding value. <span class="font-bold text-purple-600">WARNING,</span> Wrong decoded value will add penalty to your final time!</AlertDialog.Description>
-							<AlertDialog.Description
-								><div>
-									<h2 class="text-white">Enter the decryption code:</h2>
-									<CharInput on:match={checkMatch} />
-								</div></AlertDialog.Description
-							>
-							<AlertDialog.Cancel class="hover:bg-[#a527ff]">Cancel</AlertDialog.Cancel>
-						</AlertDialog.Header>
-					</AlertDialog.Content>
-				</AlertDialog.Root>
-			</div>
-		</div>
-	{/if}
-</section>
+		{/if}
+	</section>
+{/if}
 
 <style>
 	.btn {
