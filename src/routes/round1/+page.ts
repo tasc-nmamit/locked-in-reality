@@ -30,12 +30,11 @@ export const load: PageLoad = async () => {
 
 	if (docSnap.exists()) {
 		const list = docSnap.data().questions;
-		console.log(list);
-
+		// console.log(list);
 		const answers = [];
 
 		for (let i = 0; i < list.length; i++) {
-			answers.push({ answered: false, answer: '', order: rg(list[i].options.length) });
+			answers.push({ answered: false, answer: '', order: rg(list[i].length) });
 		}
 
 		return {

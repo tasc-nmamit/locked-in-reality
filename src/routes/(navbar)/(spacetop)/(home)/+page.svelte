@@ -10,7 +10,7 @@
 				<div>
 					<p class=" text-xl">Can you compete with the superior species!</p>
 					<div class="pt-4">
-						<a href="/team">
+						<a href="/round1">
 							<button class="rounded-full bg-[#bf80ff] px-4 py-2 font-semibold duration-300 hover:scale-105 dark:bg-[#9933ff]">Play → </button>
 						</a>
 					</div>
@@ -44,7 +44,7 @@
 					<div>
 						<p class="pt-6 text-center text-lg">Can you compete with the superior species!</p>
 						<div class="flex w-full justify-center pt-4">
-							<a href="/team">
+							<a href="/round1">
 								<button class="rounded-full bg-[#bf80ff] px-4 py-2 font-semibold dark:bg-[#9933ff]">Play → </button>
 							</a>
 						</div>

@@ -20,7 +20,7 @@
 				.
 			</p>
 		{:else}
-			loading
+			loading...
 		{/if}
 	</div>
 </div>

@@ -78,6 +78,11 @@
 	}
 }
 
+@font-face {
+	font-family: IBM;
+	src: url('/fonts/IBM.ttf') format('truetype');
+}
+
 @layer utilities {
 	.custom-shadow-black {
 		box-shadow:
