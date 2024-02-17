@@ -5,6 +5,7 @@
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
+	import Button from '$lib/components/ui/button/button.svelte';
 
 	export let data: PageData;
 
@@ -14,6 +15,8 @@
 	let isStarted = false;
 	let startTime: number;
 	let penaltyTime: number = 0;
+	let hintSelected: boolean[] = new Array(data.list.length).fill(false);
+	let hintView = false;
 
 	function generateRandomNumber() {
 		const randomNumber = Math.random();
@@ -79,6 +82,12 @@
 		}
 		data.answers[currentQuestion].answered = true;
 	}
+
+	function handelGetHint() {
+		hintSelected[currentQuestion] = !hintSelected[currentQuestion];
+		hintView = true;
+		penaltyTime += 5;
+	}
 </script>
 
 {#if !$user && !userData}
@@ -102,6 +111,57 @@
 	{:else}
 		<div class="mx-auto flex w-full flex-col items-center gap-y-4">
 			<div class="relative z-10 flex min-w-[36rem] max-w-xl flex-col items-center gap-4 rounded-lg border-[1px] border-white bg-black/5 p-10 backdrop-blur-md">
+				<!-- hint alert dialog -->
+				<div class="z-20  ml-auto">
+					<AlertDialog.Root>
+						<AlertDialog.Trigger ><Icon icon="tabler:bulb"  style="color: white" class="w-8 h-8"/></AlertDialog.Trigger>
+						<AlertDialog.Content class="bg-black">
+							<AlertDialog.Header>
+
+								{#if data.list[currentQuestion].hint}
+									{#if hintSelected[currentQuestion] === false}
+										{#if hintView === false}
+											<div class="flex flex-row gap-4 items-center">
+												<Icon icon="noto:warning" class="w-10 h-10"/>
+												<AlertDialog.Title class="text-2xl">Attention</AlertDialog.Title>
+											</div>
+											<AlertDialog.Title class="text-lg">Do you want to use hint for this riddle?</AlertDialog.Title>
+											<AlertDialog.Description>The hint will be displayed once and a penalty of 5sec will be imposed</AlertDialog.Description>
+											<div class="w-full flex flex-row gap-2">
+												<AlertDialog.Cancel class="hover:bg-[#a527ff] basis-1/2">Close</AlertDialog.Cancel>
+												<Button class="basis-1/2 bg-[#621799] text-white hover:text-black" on:click={() => {hintView = true}}>this is button</Button>
+											</div>
+										{:else}
+											<div class="flex flex-row gap-4 items-center">
+												<Icon icon="tabler:bulb" class="w-10 h-10"/>
+												<AlertDialog.Title class="text-2xl">Hint</AlertDialog.Title>
+											</div>
+											<AlertDialog.Title class="text-lg">Hint: {data.list[currentQuestion].hint}</AlertDialog.Title>
+											<AlertDialog.Description>The hint will be displayed once</AlertDialog.Description>
+											<AlertDialog.Cancel class="hover:bg-[#a527ff]" on:click={handelGetHint}>Close</AlertDialog.Cancel>
+										{/if}
+									{:else}
+										<div class="flex flex-row gap-4 items-center">
+											<Icon icon="fxemoji:crossmark" class="w-10 h-10"/>
+											<AlertDialog.Title class="text-2xl">Not Allowed</AlertDialog.Title>
+										</div>
+										<AlertDialog.Description>You have already used the hint</AlertDialog.Description>
+										<AlertDialog.Cancel class="hover:bg-[#a527ff]">Close</AlertDialog.Cancel>
+									{/if}
+								{:else}
+									<div class="flex flex-row gap-4 items-center">
+										<Icon icon="fxemoji:crossmark"  class="w-8 h-8"/>
+										<AlertDialog.Title>Sorry, No hint available for this question</AlertDialog.Title>
+									</div>
+									<AlertDialog.Cancel class="hover:bg-[#a527ff] basis-1/2">Close</AlertDialog.Cancel>
+								{/if}
+
+							</AlertDialog.Header>
+						</AlertDialog.Content>
+					</AlertDialog.Root>
+				</div>
+				<!-- hint alert dialog end -->
+
 				<h1 class="self-start text-left text-xl font-medium">
 					{currentQuestion + 1}. {data.list[currentQuestion].question}
 				</h1>
@@ -113,14 +173,7 @@
 						<p class="text-white">Error Wrong Code!</p>
 					{/if}
 				{/if}
-				<!-- hint[]=false
-				hint[currentQuestion] = true
-				if hint[]
-					-->
-				<!-- {#if currentQuestion === data.list.length - 1 && questionCounter === data.list.length}
-                <h1>Score: {score}</h1>
-            {/if} -->
-
+				
 				<p>Questions Attempted: {questionCounter}/{data.list.length}</p>
 				<div class="flex flex-row flex-wrap items-center justify-center gap-3">
 					{#each { length: data.list.length } as _, i}
