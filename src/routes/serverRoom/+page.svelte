@@ -49,19 +49,19 @@
 		</div>
 	</header>
 	<body class="flex h-[74%] w-full flex-wrap bg-inherit text-3xl font-[600] tracking-normal text-black">
-		<div class="flex basis-1/3 flex-col border p-10">
+		<div class="flex basis-1/3 flex-col gap-y-4 p-10">
 			<p>System Boot Time out</p>
 			<p>Boot Mode</p>
 			<p>Video BIOS</p>
 			<p>Boot Option Retry</p>
 			<p>USB Boot Priority</p>
 		</div>
-		<div class="boot-options flex basis-1/3 flex-col border p-10">
+		<div class="boot-options flex basis-1/3 flex-col gap-y-4 p-10">
 			{#each values as key, index}
 				<p class={`${active === index ? 'bg-black font-normal text-white' : ''} mainLayout`}>{key}</p>
 			{/each}
 		</div>
-		<div class="flex basis-1/3 flex-col border p-10 text-[#000069]">
+		<div class="flex basis-1/3 flex-col p-10 text-[#000069]">
 			<p>{information[active]}</p>
 		</div>
 	</body>
