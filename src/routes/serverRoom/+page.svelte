@@ -20,7 +20,7 @@
 		});
 
 		function updateActiveItem() {
-			const items = document.querySelectorAll('.boot-options p');
+			const items = document.querySelectorAll('.mainLayout');
 			items.forEach((item, index) => {
 				if (index === active) {
 					item.classList.add('bg-black', 'font-normal', 'text-white');
@@ -30,20 +30,20 @@
 			});
 		}
 
-		return () => {
-			document.removeEventListener('keydown', function (event) {
-				if (event.key === 'ArrowUp') {
-					active = Math.max(active - 1, 0);
-					updateActiveItem();
-				} else if (event.key === 'ArrowDown') {
-					active = Math.min(active + 1, values.length - 1);
-					updateActiveItem();
-				} else if (event.key === 'Enter') {
-					const url = urls[active];
-					window.location.href = url;
-				}
-			});
-		};
+		// return () => {
+		// 	document.removeEventListener('keydown', function (event) {
+		// 		if (event.key === 'ArrowUp') {
+		// 			active = Math.max(active - 1, 0);
+		// 			updateActiveItem();
+		// 		} else if (event.key === 'ArrowDown') {
+		// 			active = Math.min(active + 1, values.length - 1);
+		// 			updateActiveItem();
+		// 		} else if (event.key === 'Enter') {
+		// 			const url = urls[active];
+		// 			window.location.href = url;
+		// 		}
+		// 	});
+		// };
 	});
 </script>
 
@@ -63,7 +63,7 @@
 		</div>
 		<div class="boot-options flex basis-1/3 flex-col border p-10">
 			{#each values as key, index}
-				<p class={`${active === index ? 'bg-black font-normal text-white' : ''}`}>{key}</p>
+				<p class={`${active === index ? 'bg-black font-normal text-white' : ''} mainLayout`}>{key}</p>
 			{/each}
 		</div>
 		<div class="flex basis-1/3 flex-col border p-10 text-[#000069]">
