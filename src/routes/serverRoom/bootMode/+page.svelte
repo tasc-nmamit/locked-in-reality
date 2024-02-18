@@ -71,19 +71,19 @@
 				<h2>To unlock manual <u>Run the code</u></h2>
 			</div>
 			<div class="flex h-auto w-full flex-col items-center justify-center">
-				<textarea id="terminal" cols="30" rows="14" bind:value={textareaValue} bind:this={textareaElement} on:input={checkForSuccess} class="h-3/4 w-2/4 resize-none bg-black font-normal"></textarea>
+				<textarea id="terminal" cols="30" rows="14" bind:value={textareaValue} bind:this={textareaElement} on:input={checkForSuccess} class="h-3/4 w-2/4 resize-none bg-black font-normal cursor-none"></textarea>
 			</div>
 			<!-- auth code -->
 			<div class="mt-12 flex w-full flex-row justify-center">
 				<h3>Auth signature :</h3>
-				<h3><input type="text" bind:this={inputElement} class="bg-black px-2 py-1 font-normal text-white" /></h3>
+				<h3><input type="text" bind:this={inputElement} class="bg-black px-2 py-1 font-normal text-white cursor-none" /></h3>
 			</div>
 		</div>
 	</body>
-	<footer class="flex h-[16%] w-full items-center justify-center border bg-[#000069] text-white">
+	<!-- <footer class="flex h-[16%] w-full items-center justify-center border bg-[#000069] text-white">
 		<div class="flex h-32 w-[99%] items-center justify-center border border-x-4 border-white">
 			<div class="flex h-[65%] w-full flex-col gap-x-96 bg-black px-6 text-nowrap">
-                <div class="flex flex-row justify-between w-full mb-1">
+            	 <div class="flex flex-row justify-between w-full mb-1">
                     <p class="text-3xl tracking-widest">&#x2191&#x2193=Change line</p>
                     <p class="text-3xl tracking-widest">&ltEnter&gt=Complete Entry</p>
                     <p class="text-3xl tracking-widest">ESC=Exit Entry</p>
@@ -96,6 +96,15 @@
 			</div>
 		</div>
 	</footer> -->
+	<footer class="flex h-[16%] w-full items-center justify-center border bg-[#000069] text-white">
+		<div class="flex h-32 w-[99%] items-center justify-center border border-x-4 border-white">
+			<div class="flex h-[65%] w-full items-end justify-start gap-x-96 bg-black px-6">
+				<p class="text-3xl tracking-widest">&#x2191&#x2193=Move Highlight</p>
+				<p class="text-3xl tracking-widest">&ltEnter&gt=Complete Entry</p>
+				<p class="text-3xl tracking-widest">ESC=Exit Entry</p>
+			</div>
+		</div>
+	</footer>
 </section>
 
 <style>

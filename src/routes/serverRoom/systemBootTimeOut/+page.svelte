@@ -82,7 +82,7 @@
 	});
 </script>
 
-<section class="relative h-screen w-full bg-[#9c9a9d] font-IBM">
+<section class="relative h-screen w-full bg-[#9c9a9d] font-IBM cursor-none">
 	{#if $showModal[active]}
 		{#if modalOptions[active].length > 0}
 			<Modal title="Function" arrValues={values} {showModal} curr={active} />
@@ -94,7 +94,7 @@
 		</div>
 	</header>
 	<body class="flex h-[74%] w-full flex-wrap bg-inherit text-3xl font-[600] tracking-normal text-black">
-		<div class="flex basis-1/3 flex-col border p-10">
+		<div class="flex basis-1/3 flex-col p-10">
 			<p>Functions</p>
 			<p>Test</p>
 			<p>Fast Boot</p>
