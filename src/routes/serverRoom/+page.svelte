@@ -1,6 +1,6 @@
 <script lang="ts">
 	let active = 0;
-	const values = ['<UEFI>', '<UEFI>', '<UEFI>', '<UEFI>', '<Disabled>'];
+	const values = ['<UEFI>', '<Automatic>', '<UEFI>', '<UEFI>', '<Disabled>'];
 	const information = ['Options regarding System Boot time manipulation', 'Change Boot mode', 'Video graphic processing settings', 'Administrative Boot logs', 'Select the boot priority for USB devices'];
 	const urls = ['/serverRoom/systemBootTimeOut', '/serverRoom/bootMode', '/serverRoom/videoBios', '/serverRoom/bootOptionRetry', '/serverRoom/usbBootPriority'];
 	import { onMount } from 'svelte';
