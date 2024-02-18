@@ -2,9 +2,6 @@
     import { onMount } from 'svelte';
 	import BouncingDots from '../../chat/BouncingDots.svelte';
 	
-    const values = ['[S]', '<UEFI>', '<UEFI>', '<Disabled>', '<Enabled>'];
-    const information = ['Test Value Hahah', 'second value', 'third value', 'fourth value', 'fifth value'];
-    
     let active = 0;
     let bootStatus = "Automatic";
     let focusOn = "textarea";
@@ -26,28 +23,13 @@
             if (event.key === 'Tab') {
                 event.preventDefault(); // Prevent default tab behavior
                 changeFocus();
-            } else {
-                // Allow normal behavior for other keys
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                window.location.href = '/serverRoom';
             }
         })
     })
 /*
-	onMount(() => {
-		document.addEventListener('keydown', function (event) {
-            event.preventDefault();
-			if (event.key === 'ArrowUp') {
-				active = Math.max(active - 1, 0);
-				updateActiveItem();
-			} else if (event.key === 'ArrowDown') {
-				active = Math.min(active + 1, values.length - 1);
-				updateActiveItem();
-			} else if (event.key === 'Enter') {
-                //to do
-			}
-            else if (event.key === 'Escape') {
-                window.location.href = '/serverRoom';
-            }
-		});
 
 		function updateActiveItem() {
 			const items = document.querySelectorAll('.boot-options p');
@@ -60,20 +42,6 @@
 			});
 		}
 
-		return () => {
-			document.removeEventListener('keydown', function (event) {
-				if (event.key === 'ArrowUp') {
-					active = Math.max(active - 1, 0);
-					updateActiveItem();
-				} else if (event.key === 'ArrowDown') {
-					active = Math.min(active + 1, values.length - 1);
-					updateActiveItem();
-				} else if (event.key === 'Enter') {
-
-				}
-			});
-		};
-	});
     */
 </script>
 
@@ -93,7 +61,7 @@
                 <h2>To unlock manual <u>Run the code</u></h2>
             </div>
             <div class="w-full h-auto flex flex-col justify-center items-center">
-                <textarea name="" id="" cols="30" rows="14" bind:this={textareaElement} class="w-3/4 h-3/4 bg-black text-gray-200 resize-none"></textarea>
+                <textarea id="terminal" cols="30" rows="14" bind:this={textareaElement} class="w-3/4 h-3/4 bg-black text-gray-200 resize-none"></textarea>
             </div>
             <!-- auth code -->
             <div class="w-full flex flex-row justify-evenly mt-12">
@@ -119,3 +87,26 @@
 		</div>
 	</footer>
 </section>
+
+<style>
+    textarea{
+        caret: white;
+    }
+    input{
+        caret: black;
+        outline: none;
+    }
+
+    #terminal {
+        background-color: #000000;
+        color: #eeeeec;
+        border: none;
+        padding: 10px;
+        overflow: auto;
+        scrollbar-width: none;
+    }
+
+    textarea::-webkit-scrollbar {
+        display: none; /* For Chrome, Safari and Opera */
+    }
+</style>
