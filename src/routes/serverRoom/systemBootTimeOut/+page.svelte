@@ -2,26 +2,51 @@
 	let active = 0;
 	const values = ['[S]', '<UEFI>', '<UEFI>', '<Disabled>', '<Enabled>'];
 	const information = ['Test Value Hahah', 'second value', 'third value', 'fourth value', 'fifth value'];
+	import { writable } from 'svelte/store';
+	let showModal = writable(new Array(values.length).fill(false));
+
+	import Modal from '$lib/components/LIR/Modal.svelte';
 	import { onMount } from 'svelte';
 
 	onMount(() => {
-		document.addEventListener('keydown', function (event) {
+		//@ts-expect-error
+		function handleKeyPress(event) {
+			if ($showModal[active]) {
+				return;
+			}
 			if (event.key === 'ArrowUp') {
 				active = Math.max(active - 1, 0);
 				updateActiveItem();
+				return;
 			} else if (event.key === 'ArrowDown') {
 				active = Math.min(active + 1, values.length - 1);
 				updateActiveItem();
+				return;
 			} else if (event.key === 'Enter') {
-
+				$showModal[active] = true;
+				const valueToCopy = information[active];
+				navigator.clipboard
+					.writeText(valueToCopy)
+					.then(() => alert(`Value copied : ${valueToCopy}`))
+					.catch((error) => console.error('Unable to copy value:', error));
+				console.log('Enter');
+				return;
+			} else if (event.key === 'Escape') {
+				window.location.href = '/serverRoom';
+				return;
 			}
-            else if (event.key === 'Escape') {
-                window.location.href = '/serverRoom';
-            }
-		});
+		}
+
+		// Add the event listener
+		document.addEventListener('keyup', handleKeyPress);
+
+		// Clean up by removing the event listener when the component is unmounted
+		return () => {
+			document.removeEventListener('keyup', handleKeyPress);
+		};
 
 		function updateActiveItem() {
-			const items = document.querySelectorAll('.boot-options p');
+			const items = document.querySelectorAll('.sysBoot');
 			items.forEach((item, index) => {
 				if (index === active) {
 					item.classList.add('bg-black', 'font-normal', 'text-white');
@@ -30,24 +55,13 @@
 				}
 			});
 		}
-
-		return () => {
-			document.removeEventListener('keydown', function (event) {
-				if (event.key === 'ArrowUp') {
-					active = Math.max(active - 1, 0);
-					updateActiveItem();
-				} else if (event.key === 'ArrowDown') {
-					active = Math.min(active + 1, values.length - 1);
-					updateActiveItem();
-				} else if (event.key === 'Enter') {
-
-				}
-			});
-		};
 	});
 </script>
 
-<section class="h-screen w-full cursor-none bg-[#9c9a9d] font-IBM">
+<section class="relative h-screen w-full bg-[#9c9a9d] font-IBM">
+	{#if $showModal[active]}
+		<Modal title="Function" arrValues={values} {showModal} curr={active} />
+	{/if}
 	<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
 		<div class="flex h-20 w-[99%] items-center justify-center border border-x-4 border-white">
 			<h1 class="text-center text-4xl font-medium text-white">System Boot Time Out</h1>
@@ -63,7 +77,7 @@
 		</div>
 		<div class="boot-options flex basis-1/3 flex-col border p-10">
 			{#each values as key, index}
-				<p class={`${active === index ? 'bg-black font-normal text-white' : ''}`}>{key}</p>
+				<p class={`${active === index ? 'bg-black font-normal text-white' : ''} sysBoot`}>{key}</p>
 			{/each}
 		</div>
 		<div class="flex basis-1/3 flex-col border p-10 text-[#000069]">
