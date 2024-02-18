@@ -95,13 +95,26 @@
 
 	function handelGetHint() {
 		hintSelected[currentQuestion] = !hintSelected[currentQuestion];
-		hintView = true;
+		hintView = false;
 		penaltyTime += 5;
 	}
 
 	function causeRedirect(path: string) {
 		redirect(300, path);
 	}
+
+	import { onMount } from 'svelte';
+
+	function confirmReload(event: { preventDefault: () => void; returnValue: string; }) {
+		event.preventDefault();
+  	}
+
+	onMount(() => {
+		window.addEventListener('beforeunload', confirmReload);
+		return () => {
+		window.removeEventListener('beforeunload', confirmReload);
+		};
+	});
 </script>
 
 {#if !$userProfileData?.lir && !$userData && !user}
