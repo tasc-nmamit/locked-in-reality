@@ -1,12 +1,16 @@
-<script>
+<script lang="ts">
 	let active = 0;
-	const values = ['[S]', '<UEFI>', '<UEFI>', '<Disabled>', '<Enabled>'];
-	const information = ['Test Value Hahah', 'second value', 'third value', 'fourth value', 'fifth value'];
+	const values = ['<UEFI>', '<UEFI>', '<UEFI>', '<UEFI>', '<Disabled>'];
+	const information = ['Options regarding System Boot time manipulation', 'Change Boot mode', 'Video graphic processing settings', 'Administrative Boot logs', 'Select the boot priority for USB devices'];
 	const urls = ['/serverRoom/systemBootTimeOut', '/serverRoom/bootMode', '/serverRoom/videoBios', '/serverRoom/bootOptionRetry', '/serverRoom/usbBootPriority'];
 	import { onMount } from 'svelte';
 
 	onMount(() => {
-		document.addEventListener('keydown', function (event) {
+		document.addEventListener('keydown', (event) => {
+			keyEvent(event);
+		});
+
+		function keyEvent (event : any) {
 			if (event.key === 'ArrowUp') {
 				active = Math.max(active - 1, 0);
 				updateActiveItem();
@@ -16,8 +20,10 @@
 			} else if (event.key === 'Enter') {
 				const url = urls[active];
 				window.location.href = url;
+			} else {
+				event.preventDefault();
 			}
-		});
+		}
 
 		function updateActiveItem() {
 			const items = document.querySelectorAll('.mainLayout');
@@ -30,20 +36,9 @@
 			});
 		}
 
-		// return () => {
-		// 	document.removeEventListener('keydown', function (event) {
-		// 		if (event.key === 'ArrowUp') {
-		// 			active = Math.max(active - 1, 0);
-		// 			updateActiveItem();
-		// 		} else if (event.key === 'ArrowDown') {
-		// 			active = Math.min(active + 1, values.length - 1);
-		// 			updateActiveItem();
-		// 		} else if (event.key === 'Enter') {
-		// 			const url = urls[active];
-		// 			window.location.href = url;
-		// 		}
-		// 	});
-		// };
+		return () => {
+			document.removeEventListener('keydown', keyEvent);
+		};
 	});
 </script>
 

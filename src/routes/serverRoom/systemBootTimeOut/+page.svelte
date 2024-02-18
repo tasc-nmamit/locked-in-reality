@@ -8,41 +8,62 @@
 	import Modal from '$lib/components/LIR/Modal.svelte';
 	import { onMount } from 'svelte';
 
+	const modalOptions = [
+		['Normal Timeout', 'Test', 'Fast Boot', 'Diagnosis log', 'Manual Override', 'System Reset'],
+		['safe mode', 'user mode', 'fast mode', 'dev mode'],
+		['System test' , 'Server test' , 'Diagnosis test'],
+		['Enable' , 'Disable'],
+		['view logs','view errors','view warnings'],
+		[],
+		[]
+	]
+	let modalStack = []
+
 	onMount(() => {
 		//@ts-expect-error
 		function handleKeyPress(event) {
-			if ($showModal[active]) {
-				return;
-			}
-			if (event.key === 'ArrowUp') {
-				active = Math.max(active - 1, 0);
-				updateActiveItem();
-				return;
+			event.preventDefault();
+			if (event.key === 'Escape') {
+				if ($showModal[active] === true){
+					$showModal[active] = false;
+				} else {
+					window.location.href = '/serverRoom';
+				}
+			} else if (event.key === 'ArrowUp') {
+				if ($showModal[active]) {
+					// return;
+				} else {
+					active = Math.max(active - 1, 0);
+					updateActiveItem();
+				}
 			} else if (event.key === 'ArrowDown') {
-				active = Math.min(active + 1, values.length - 1);
-				updateActiveItem();
-				return;
+				if ($showModal[active]) {
+					// return;
+				} else {
+					active = Math.min(active + 1, values.length - 1);
+					updateActiveItem();
+				}
 			} else if (event.key === 'Enter') {
-				$showModal[active] = true;
-				const valueToCopy = information[active];
-				navigator.clipboard
-					.writeText(valueToCopy)
-					.then(() => alert(`Value copied : ${valueToCopy}`))
-					.catch((error) => console.error('Unable to copy value:', error));
-				console.log('Enter');
-				return;
-			} else if (event.key === 'Escape') {
-				window.location.href = '/serverRoom';
-				return;
+				if ($showModal[active]) {
+					// return;
+				} else {
+					$showModal[active] = true;
+					const valueToCopy = information[active];
+					navigator.clipboard
+						.writeText(valueToCopy)
+						.then(() => alert(`Value copied : ${valueToCopy}`))
+						.catch((error) => console.error('Unable to copy value:', error));
+					console.log('Enter');
+				}
 			}
 		}
 
 		// Add the event listener
-		document.addEventListener('keyup', handleKeyPress);
+		document.addEventListener('keydown', handleKeyPress);
 
 		// Clean up by removing the event listener when the component is unmounted
 		return () => {
-			document.removeEventListener('keyup', handleKeyPress);
+			document.removeEventListener('keydown', handleKeyPress);
 		};
 
 		function updateActiveItem() {
@@ -60,7 +81,9 @@
 
 <section class="relative h-screen w-full bg-[#9c9a9d] font-IBM">
 	{#if $showModal[active]}
-		<Modal title="Function" arrValues={values} {showModal} curr={active} />
+		{#if modalOptions[active].length > 0}
+			<Modal title="Function" arrValues={values} {showModal} curr={active} />
+		{/if}
 	{/if}
 	<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
 		<div class="flex h-20 w-[99%] items-center justify-center border border-x-4 border-white">
@@ -69,11 +92,12 @@
 	</header>
 	<body class="flex h-[74%] w-full flex-wrap bg-inherit text-3xl font-[600] tracking-normal text-black">
 		<div class="flex basis-1/3 flex-col border p-10">
-			<p>Functions</p>
+			<p>Normal Timeout</p>
 			<p>Test</p>
-			<p>BS</p>
-			<p>SOme more BS</p>
-			<p>BUBUBUB</p>
+			<p>Fast Boot</p>
+			<p>Diagnosis Scan</p>
+			<p>Manual Override</p>
+			<p>System Reset</p>
 		</div>
 		<div class="boot-options flex basis-1/3 flex-col border p-10">
 			{#each values as key, index}
