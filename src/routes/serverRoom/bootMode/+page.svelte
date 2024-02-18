@@ -4,28 +4,28 @@
 	
     let active = 0;
     let bootStatus = "Automatic";
-    let focusOn = "textarea";
     let textareaElement:HTMLTextAreaElement;
     let inputElement:HTMLInputElement;
 
-    const changeFocus = () => {
-        if (focusOn === "textarea") {
-            focusOn = "authinput";
+    const changeFocus = (direction : string) => {
+        if (direction === "ArrowDown") {
             inputElement.focus();
         } else {
-            focusOn = "textarea";
             textareaElement.focus();
         }
     }
 
     onMount(() => {
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'Tab') {
+            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
                 event.preventDefault(); // Prevent default tab behavior
-                changeFocus();
+                changeFocus(event.key);
             } else if (event.key === 'Escape') {
                 event.preventDefault();
                 window.location.href = '/serverRoom';
+            } else if (event.key === 'Tab' || event.key === 'F1' || event.key === 'F2' || event.key === 'F3' || event.key === 'F4' || event.key === 'F5' || event.key === 'F6' || event.key === 'F7' || event.key === 'F8' || event.key === 'F9' || event.key === 'F10' || event.key === 'F11' || event.key === 'F12') { 
+                // prevent use of funtion keys to open dev tools or refresh the page
+                event.preventDefault();
             }
         })
     })
@@ -72,17 +72,17 @@
 	</body>
 	<footer class="flex h-[16%] w-full items-center justify-center border bg-[#000069] text-white">
 		<div class="flex h-32 w-[99%] items-center justify-center border border-x-4 border-white">
-			<div class="flex h-[65%] w-full flex-col gap-x-96 bg-black px-6 text-nowrap">
+			<div class="flex h-[65%] w-full flex-col gap-x-96 bg-black px-6 text-nowrap justify-center">
                 <div class="flex flex-row justify-between w-full mb-1">
                     <p class="text-3xl tracking-widest">&#x2191&#x2193=Change line</p>
                     <p class="text-3xl tracking-widest">&ltEnter&gt=Complete Entry</p>
                     <p class="text-3xl tracking-widest">ESC=Exit Entry</p>
                 </div>
-                <div class="flex flex-row justify-between w-full">
+                <!-- <div class="flex flex-row justify-between w-full">
                     <p class="text-3xl tracking-widest">&ltTab&gt=Move Highlight</p>
                     <p></p>
                     <p></p>
-                </div>
+                </div> -->
 			</div>
 		</div>
 	</footer>
