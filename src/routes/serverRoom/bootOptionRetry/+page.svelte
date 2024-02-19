@@ -60,7 +60,19 @@
 						currentModal = tempArrValues[modalIndex];
 					} else if (typeof(tempArrValues[modalIndex]) === 'string') {
 						// do nothing just copy the  value
-						copyToClipBoard();
+						// test here
+						if (tempArrValues[modalIndex] === '<Manual Override>') {
+							const valueToCopy = `void runFn(){
+     doSomething();
+     return null;
+ }`;
+							navigator.clipboard
+							.writeText(valueToCopy)
+							.then(() => alert(`Value copied`)) // value not shown cuz let the players navigate multiple times in search of the code
+							.catch((error) => console.error('Unable to copy value:', error));
+						} else {
+							copyToClipBoard();
+						}
 					}
 					modalZIndex += 1;
 					modalIndex = 0;
