@@ -59,7 +59,7 @@
 <section class="h-screen w-full cursor-none bg-[#9c9a9d] font-IBM">
 	<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
 		<div class="flex h-20 w-[99%] items-center justify-center border border-x-4 border-white">
-			<h1 class="text-center text-4xl font-medium text-white">System Boot Time Out</h1>
+			<h1 class="text-center text-4xl font-medium text-white">Boot Mode</h1>
 		</div>
 	</header>
 	<body class="flex h-[74%] w-full flex-wrap bg-inherit text-3xl font-[600] tracking-normal text-black">
