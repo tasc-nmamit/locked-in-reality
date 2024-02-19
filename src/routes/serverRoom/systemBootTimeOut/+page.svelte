@@ -11,7 +11,7 @@
 
 	const modalOptions = [
 		{'[S]' : ['Normal Timeout', {'<Test>' : ['value one' , 'value two']}, 'Fast Boot', '<Diagnosis log>', '<Manual Override>', 'System Reset']},
-		{'<UEFI>' : ['safe mode', 'user mode', 'fast mode', 'dev mode']},
+		{'<UEFI>' : ['safe mode', {'user mode' : ["one" , "two"]}, 'fast mode', 'dev mode']},
 		{'<Disabled>' : ['System test' , 'Server test' , 'Diagnosis test']},
 		{'<Enabled>' : ['Enable' , 'Disable']},
 		{'<UEFI>' : []},
@@ -29,11 +29,12 @@
 			if (event.key === 'Escape') {
 				if ($showModal[active] === true){
 					modalStack.pop();
-					if (modalStack.length > 1) {
+					if (modalStack.length > 0) {
 						currentModal = modalStack[modalStack.length - 1];
-					} else {
+					} else if (modalStack.length === 0) {
 						$showModal[active] = false;
 					}
+					modalIndex = 0;
 					modalZIndex -= 1
 				} else {
 					window.location.href = '/serverRoom';
@@ -59,14 +60,21 @@
 						currentModal = tempArrValues[modalIndex];
 					} else if (typeof(tempArrValues[modalIndex]) === 'string') {
 						// do nothing just copy the  value
+						copyToClipBoard();
 					}
 					modalZIndex += 1;
 					modalIndex = 0;
 				} else {
+					//@ts-expect-error
 					modalStack.push(modalOptions[active])
 					$showModal[active] = true;
-				}
-				const valueToCopy = randomMessage();
+				}		
+			}
+		}
+
+		// copy function
+		function copyToClipBoard () {
+			const valueToCopy = randomMessage();
 				// the below message will be copied which is the required code
 				/*
  				const valueToCopy = `void runFn(){
@@ -77,8 +85,7 @@
 				navigator.clipboard
 					.writeText(valueToCopy)
 					.then(() => alert(`Value copied`)) // value not shown cuz let the players navigate multiple times in search of the code
-					.catch((error) => console.error('Unable to copy value:', error));				
-			}
+					.catch((error) => console.error('Unable to copy value:', error));
 		}
 
 		// Add the event listener
@@ -102,8 +109,8 @@
 	});
 
 	// states to keep track of the modal
-	$: modalZIndex = 0
-	$: modalIndex = 0
+	let modalZIndex = 0
+	let modalIndex = 0
 	$: currentModal = modalOptions[active]
 	$: title= Object.keys(currentModal)[0]
 	$: tempArrValues = Object.values(currentModal)[0]
@@ -113,7 +120,6 @@
 	 * @param {string | any[]} tempArrValues
 	 */
 	function updateArrValues(tempArrValues) {
-		console.log(tempArrValues);
 		let arrValues = [];
 		for (let i = 0; i < tempArrValues.length; i++) {
 			if (typeof(tempArrValues[i]) === 'object') {
@@ -124,6 +130,16 @@
 		}
 		return arrValues;
 	}
+
+	// Copy alert Modal implementation
+	/*
+	let timeOut = 2000;
+	let showCopyAlert = writable(true);
+	function executeCopyAlert() {
+		// to do
+		showCopyAlert.set(true);
+	}
+	*/
 </script>
 
 <section class="relative h-screen w-full bg-[#9c9a9d] font-IBM cursor-none">
@@ -132,7 +148,10 @@
 			<Modal title={title} arrValues={arrValues} {showModal} message={"LOL you are not authorized to change it"} curr={active} />
 		{/if}
 	{/if}
-	<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
+	<!-- {#if $showModal[active] && !showCopyAlert}
+			<Modal title={"Warning"} arrValues={[]} showModal message={"Value copied"} curr={active} />
+	{/if} -->
+		<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
 		<div class="flex h-20 w-[99%] items-center justify-center border border-x-4 border-white">
 			<h1 class="text-center text-4xl font-medium text-white">System Boot Time Out</h1>
 		</div>
