@@ -5,6 +5,7 @@
 	export let arrValues = ['[S]', '<UEFI>', '<UEFI>', '<Disabled>', '<Enabled>'];
 	export let showModal;
 	export let curr: number;
+	export let message: string;
 
 	onMount(() => {
 		document.addEventListener('keydown', function (event) {
@@ -56,9 +57,13 @@
 		<h1 class="w-full text-center text-4xl text-white">{title}</h1>
 		<hr class="h-[2px] w-full bg-white" />
 		<div class="flex flex-col p-2 font-normal text-white">
-			{#each arrValues as key, index}
-				<p class={`${active === index ? 'bg-black font-normal text-white' : ''} modalItem`}>{key}</p>
-			{/each}
+			{#if arrValues.length === 0 && message !== ''}
+				<p class="text-center text-white">{message}</p>
+			{:else}
+				{#each arrValues as key, index}
+					<p class={`${active === index ? 'bg-black font-normal text-white' : ''} modalItem`}>{key}</p>
+				{/each}
+			{/if}
 		</div>
 	</div>
 </div>
