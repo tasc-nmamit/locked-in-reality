@@ -1,40 +1,33 @@
 <script>
 	let active = 0;
-	const values = ['[S]', '<UEFI>', '<UEFI>', '<Disabled>', '<Disabled>' , 'disabled'];
-	const information = ['All functions on System boot timeout', 'Test System booting', 'change fast boot', 'Diagonise system booting', 'Override booting','Reset system booting'];
+	const values = ['[S]', '<UEFI>', '<UEFI>', '<Disabled>', '<Disabled>', 'disabled'];
+	const information = ['All functions on System boot timeout', 'Test System booting', 'change fast boot', 'Diagonise system booting', 'Override booting', 'Reset system booting'];
 	let showModal = writable(new Array(values.length).fill(false));
-	
-	import { writable } from 'svelte/store';
+
 	import Modal from '$lib/components/LIR/Modal.svelte';
 	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 	import { randomMessage } from '../randomMessage';
 
-	const modalOptions = [
-		{'[S]' : ['Normal Timeout', {'<Test>' : ['value one' , 'value two']}, 'Fast Boot', '<Diagnosis log>', '<Manual Override>', 'System Reset']},
-		{'<UEFI>' : ['safe mode', 'user mode', 'fast mode', 'dev mode']},
-		{'<Disabled>' : ['System test' , 'Server test' , 'Diagnosis test']},
-		{'<Enabled>' : ['Enable' , 'Disable']},
-		{'<UEFI>' : []},
-		{'<Disabled>' : []},
-		]
+	const modalOptions = [{ '[S]': ['Normal Timeout', { '<Test>': ['value one', 'value two'] }, 'Fast Boot', '<Diagnosis log>', '<Manual Override>', 'System Reset'] }, { '<UEFI>': ['safe mode', 'user mode', 'fast mode', 'dev mode'] }, { '<Disabled>': ['System test', 'Server test', 'Diagnosis test'] }, { '<Enabled>': ['Enable', 'Disable'] }, { '<UEFI>': [] }, { '<Disabled>': [] }];
 	/**
 	 * @type {({ '[S]': string[]; '<UEFI>'?: undefined; '<Disabled>'?: undefined; '<Enabled>'?: undefined; } | { '<UEFI>': string[]; '[S]'?: undefined; '<Disabled>'?: undefined; '<Enabled>'?: undefined; } | { '<Disabled>': string[]; '[S]'?: undefined; '<UEFI>'?: undefined; '<Enabled>'?: undefined; } | { '<Enabled>': string[]; '[S]'?: undefined; '<UEFI>'?: undefined; '<Disabled>'?: undefined; })[]}
 	 */
-	let modalStack = [] // contains objects of modal options
+	let modalStack = []; // contains objects of modal options
 
 	onMount(() => {
 		//@ts-expect-error
 		function handleKeyPress(event) {
 			event.preventDefault();
 			if (event.key === 'Escape') {
-				if ($showModal[active] === true){
+				if ($showModal[active] === true) {
 					modalStack.pop();
 					if (modalStack.length > 1) {
 						currentModal = modalStack[modalStack.length - 1];
 					} else {
 						$showModal[active] = false;
 					}
-					modalZIndex -= 1
+					modalZIndex -= 1;
 				} else {
 					window.location.href = '/serverRoom';
 				}
@@ -54,16 +47,17 @@
 				}
 			} else if (event.key === 'Enter') {
 				if ($showModal[active]) {
-					if (typeof(tempArrValues[modalIndex]) === 'object') {
+					if (typeof tempArrValues[modalIndex] === 'object') {
 						modalStack.push(tempArrValues[modalIndex]);
 						currentModal = tempArrValues[modalIndex];
-					} else if (typeof(tempArrValues[modalIndex]) === 'string') {
+					} else if (typeof tempArrValues[modalIndex] === 'string') {
 						// do nothing just copy the  value
 					}
 					modalZIndex += 1;
 					modalIndex = 0;
 				} else {
-					modalStack.push(modalOptions[active])
+					//@ts-expect-error
+					modalStack.push(modalOptions[active]);
 					$showModal[active] = true;
 				}
 				const valueToCopy = randomMessage();
@@ -77,7 +71,7 @@
 				navigator.clipboard
 					.writeText(valueToCopy)
 					.then(() => alert(`Value copied`)) // value not shown cuz let the players navigate multiple times in search of the code
-					.catch((error) => console.error('Unable to copy value:', error));				
+					.catch((error) => console.error('Unable to copy value:', error));
 			}
 		}
 
@@ -102,12 +96,12 @@
 	});
 
 	// states to keep track of the modal
-	$: modalZIndex = 0
-	$: modalIndex = 0
-	$: currentModal = modalOptions[active]
-	$: title= Object.keys(currentModal)[0]
-	$: tempArrValues = Object.values(currentModal)[0]
-	$: arrValues = updateArrValues(tempArrValues)
+	$: modalZIndex = 0;
+	$: modalIndex = 0;
+	$: currentModal = modalOptions[active];
+	$: title = Object.keys(currentModal)[0];
+	$: tempArrValues = Object.values(currentModal)[0];
+	$: arrValues = updateArrValues(tempArrValues);
 
 	/**
 	 * @param {string | any[]} tempArrValues
@@ -116,9 +110,9 @@
 		console.log(tempArrValues);
 		let arrValues = [];
 		for (let i = 0; i < tempArrValues.length; i++) {
-			if (typeof(tempArrValues[i]) === 'object') {
+			if (typeof tempArrValues[i] === 'object') {
 				arrValues.push(Object.keys(tempArrValues[i])[0]);
-			} else if (typeof(tempArrValues[i]) === 'string') {
+			} else if (typeof tempArrValues[i] === 'string') {
 				arrValues.push(tempArrValues[i]);
 			}
 		}
@@ -126,10 +120,10 @@
 	}
 </script>
 
-<section class="relative h-screen w-full bg-[#9c9a9d] font-IBM cursor-none">
+<section class="relative h-screen w-full cursor-none bg-[#9c9a9d] font-IBM">
 	{#if $showModal[active]}
 		{#if modalStack.length > 0}
-			<Modal title={title} arrValues={arrValues} {showModal} message={"LOL you are not authorized to change it"} curr={active} />
+			<Modal {title} {arrValues} {showModal} message={'LOL you are not authorized to change it'} curr={active} />
 		{/if}
 	{/if}
 	<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
@@ -138,7 +132,7 @@
 		</div>
 	</header>
 	<body class="flex h-[74%] w-full flex-wrap bg-inherit text-3xl font-[600] tracking-normal text-black">
-		<div class="flex basis-1/3 flex-col p-10 gap-y-4">
+		<div class="flex basis-1/3 flex-col gap-y-4 p-10">
 			<p>Functions</p>
 			<p>Test</p>
 			<p>Fast Boot</p>
