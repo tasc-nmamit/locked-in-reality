@@ -8,6 +8,7 @@
 	import Modal from '$lib/components/LIR/Modal.svelte';
 	import { onMount } from 'svelte';
 	import { randomMessage } from '../randomMessage';
+	import { desiredString } from '../desiredString';
 
 	const modalOptions = [
 		{'[S]' : ['Normal Timeout', {'<Test>' : ['value one' , 'value two']}, 'Fast Boot', '<Diagnosis log>', '<Manual Override>', 'System Reset']},
@@ -62,10 +63,7 @@
 						// do nothing just copy the  value
 						// test here
 						if (tempArrValues[modalIndex] === '<Manual Override>') {
-							const valueToCopy = `void runFn(){
-     doSomething();
-     return null;
- }`;
+							const valueToCopy = desiredString;
 							navigator.clipboard
 							.writeText(valueToCopy)
 							.then(() => alert(`Value copied`)) // value not shown cuz let the players navigate multiple times in search of the code
