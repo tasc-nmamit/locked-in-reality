@@ -56,16 +56,16 @@
 				]
             },
             {
-                '<Normal Boot>': {
-                    'Verbose Boot': ['Enabled', 'Disabled'],
-                    'Diagnostic Boot': ['Enabled', 'Disabled']
-                }
+                '<Normal Boot>': [
+                    {'Verbose Boot': ['Enabled', 'Disabled']},
+                    {'Diagnostic Boot': ['Enabled', 'Disabled']}
+				]
             },
             {
-                '<Safe Boot>': {
-                    'Minimal Boot': ['Enabled', 'Disabled'],
-                    'Network Boot': ['Enabled', 'Disabled']
-                }
+                '<Safe Boot>': [
+                    {'Minimal Boot': ['Enabled', 'Disabled']},
+                    {'Network Boot': ['Enabled', 'Disabled']}
+				]
             }
         ]
     }

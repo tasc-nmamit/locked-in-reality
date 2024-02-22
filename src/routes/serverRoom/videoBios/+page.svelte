@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
 	let active = 0;
-	const values = ['[S]', '<UEFI>', '<UEFI>', '<Disabled>', '<Disabled>' , 'disabled'];
-	const information = ['All functions on System boot timeout', 'Test System booting', 'change fast boot', 'Diagonise system booting', 'Override booting','Reset system booting'];
+	const values = ["[Main]" , "[Advanced]" , "<Cooling Configuration>"];
+	const information = ['All functions on Video BIOS', 'Advanced Video options', 'Cooling settings for the server'];
 	let showModal = writable(new Array(values.length).fill(false));
 	
 	import { writable } from 'svelte/store';
@@ -10,16 +10,66 @@
 	import { randomMessage } from '../randomMessage';
 
 	const modalOptions = [
-		{'[S]' : ['Normal Timeout', {'<Test>' : ['value one' , 'value two']}, 'Fast Boot', '<Diagnosis log>', '<Manual Override>', 'System Reset']},
-		{'<UEFI>' : ['safe mode', {'user mode' : ["one" , "two"]}, 'fast mode', 'dev mode']},
-		{'<Disabled>' : ['System test' , 'Server test' , 'Diagnosis test']},
-		{'<Enabled>' : ['Enable' , 'Disable']},
-		{'<UEFI>' : []},
-		{'<Disabled>' : []},
-		]
-	/**
-	 * @type {({ '[S]': string[]; '<UEFI>'?: undefined; '<Disabled>'?: undefined; '<Enabled>'?: undefined; } | { '<UEFI>': string[]; '[S]'?: undefined; '<Disabled>'?: undefined; '<Enabled>'?: undefined; } | { '<Disabled>': string[]; '[S]'?: undefined; '<UEFI>'?: undefined; '<Enabled>'?: undefined; } | { '<Enabled>': string[]; '[S]'?: undefined; '<UEFI>'?: undefined; '<Disabled>'?: undefined; })[]}
-	 */
+  {
+    "[Main]" : [
+      {
+        "<Information>" : [
+          { "<System Summary>" : []},
+          "Component Information"
+        ]
+      },
+      {
+        "<Configuration>" : [
+          {
+            "<System Configuration>" : [
+              "System Settings",
+              {"<Advanced Settings>" : []}
+            ]
+          },
+          {
+            "<Peripheral Configuration>" : [
+              {"<Video Output>" : []},
+              "CUDA Processing"
+            ]
+          }
+        ]
+      },
+      {"<Boot>": []}
+    ]
+  },
+  {
+    "[Advanced]" : [
+      {
+        "<i-GPU Configuration>" : [
+          {"<Video Memory>" : ["1024" , "2048" , "3072" , "4096" , {"<Custom Value>" : []} , "[No Limit]"] },
+          {"<Overclocking>" : ["Memory Overclocking","Frequency overclocking"] }
+        ]
+      },
+      {
+        "<Memory Configuration>" : [
+          {"[Memory Settings]" : [{"<Custom Memory>": []} , "Auto memory allocation"] },
+          { "<XMP Profile>" : "XMP Profile information" }
+        ]
+      },
+	  {
+        "<Dedicated GPU Configuration>" : [
+          {"<Video Memory>" : ["1024" , "2048" , "3072" , "4096" , {"<Custom Value>" : []} , "No Limit"] },
+          {"<Overclocking>" : ["Memory Overclocking","Frequency overclocking"] }
+        ]
+      }
+    ]
+  },
+  {
+	"<Cooling Configuration>" : [
+		{"<Fan Configuration>" : ["Auto" ,{ "[Manual]":[]}] },
+		{"<Fan Speed>" : ["Low" , "Medium" , "High" , {"<custom>" : []}] },
+		{"<Fan Curve>" : [{"[Custom]" : []}, "Predefined" , "profile 1" , "profile 2"] },
+		{"<Temperature>" : ["Celsius" , "Fahrenheit" , "Kelvin" , {"<custom>" : []}] },
+	],
+  }
+  // Add more sections as needed
+];
+  	// @ts-expect-error
 	let modalStack = [] // contains objects of modal options
 
 	let showPopUp = false;
@@ -30,8 +80,10 @@
 			event.preventDefault();
 			if (event.key === 'Escape') {
 				if ($showModal[active] === true){
+					// @ts-ignore
 					modalStack.pop();
 					if (modalStack.length > 0) {
+						// @ts-ignore
 						currentModal = modalStack[modalStack.length - 1];
 					} else if (modalStack.length === 0) {
 						$showModal[active] = false;
@@ -58,7 +110,9 @@
 			} else if (event.key === 'Enter') {
 				if ($showModal[active]) {
 					if (typeof(tempArrValues[modalIndex]) === 'object') {
+						// @ts-ignore
 						modalStack.push(tempArrValues[modalIndex]);
+						// @ts-ignore
 						currentModal = tempArrValues[modalIndex];
 					} else if (typeof(tempArrValues[modalIndex]) === 'string') {
 						// do nothing just copy the  value
@@ -66,8 +120,8 @@
 					}
 					modalZIndex += 1;
 					modalIndex = 0;
-				} else {
-					//@ts-expect-error
+				} else // @ts-ignore
+				{
 					modalStack.push(modalOptions[active])
 					$showModal[active] = true;
 				}		
@@ -77,13 +131,6 @@
 		// copy function
 		function copyToClipBoard () {
 			const valueToCopy = randomMessage();
-				// the below message will be copied which is the required code
-				/*
- 				const valueToCopy = `void runFn(){
-     doSomething();
-     return null;
- }`;
- 				*/
 				navigator.clipboard
 					.writeText(valueToCopy)
 					.then(() => {
@@ -126,7 +173,7 @@
 	/**
 	 * @param {string | any[]} tempArrValues
 	 */
-	function updateArrValues(tempArrValues) {
+	function updateArrValues(tempArrValues: string | any[]) {
 		let arrValues = [];
 		for (let i = 0; i < tempArrValues.length; i++) {
 			if (typeof(tempArrValues[i]) === 'object') {
@@ -150,17 +197,14 @@
 	{/if}
 		<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
 		<div class="flex h-20 w-[99%] items-center justify-center border border-x-4 border-white">
-			<h1 class="text-center text-4xl font-medium text-white">System Boot Time Out</h1>
+			<h1 class="text-center text-4xl font-medium text-white">Video BIOS</h1>
 		</div>
 	</header>
 	<body class="flex h-[74%] w-full flex-wrap bg-inherit text-3xl font-[600] tracking-normal text-black">
 		<div class="flex basis-1/3 flex-col p-10 gap-y-4">
-			<p>Functions</p>
-			<p>Test</p>
-			<p>Fast Boot</p>
-			<p>Diagnosis Scan</p>
-			<p>Manual Override</p>
-			<p>System Reset</p>
+			<p>Video BIOS</p>
+			<p>Advanced</p>
+			<p>Cooling Configuration</p>
 		</div>
 		<div class="boot-options flex basis-1/3 flex-col gap-y-4 p-10">
 			{#each values as key, index}
