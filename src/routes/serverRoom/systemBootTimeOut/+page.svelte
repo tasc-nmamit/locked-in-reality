@@ -1,6 +1,6 @@
 <script>
 	let active = 0;
-	const values = ['[S]', '<UEFI>', '<UEFI>', '<Disabled>', '<Disabled>' , 'disabled'];
+	const values = ['[S]', '<UEFI>', '<scan>', '<diagnosis>', '<override>' , '<reset>' , '<options>'];
 	const information = ['All functions on System boot timeout', 'Test System booting', 'change fast boot', 'Diagonise system booting', 'Override booting','Reset system booting'];
 	let showModal = writable(new Array(values.length).fill(false));
 	
@@ -10,13 +10,67 @@
 	import { randomMessage } from '../randomMessage';
 
 	const modalOptions = [
-		{'[S]' : ['Normal Timeout', {'<Test>' : ['Long run' , 'Short hunt']}, 'Fast Boot', '<Diagnosis log>', '<Manual Override>', 'System Reset']},
-		{'<UEFI>' : ['safe mode', {'user mode' : ["one" , "two"]}, 'fast mode', 'dev mode']},
-		{'<Disabled>' : ['System test' , 'Server test' , 'Diagnosis test']},
-		{'<Enabled>' : ['Enable' , 'Disable']},
-		{'<UEFI>' : []},
-		{'<Disabled>' : []},
-		]
+    {
+        '[S]': [
+            'Normal Timeout',
+            {'<Test>': ['Manual Test', 'Automatic test' , 'semi-automatic test']},
+            'Fast Boot',
+            '[Diagnosis log]',
+            {'<Manual Override>' : []},
+            {'System Reset' : []}
+        ]
+    },
+    {
+        '<UEFI>': [
+            'safe mode',
+            {'<user mode>': ['admin', 'user']},
+            'fast mode',
+            'dev mode'
+        ]
+    },
+    {
+        '<scan>': [
+            'System test',
+            'Server test',
+            'Diagnosis test'
+        ]
+    },
+    {
+        '<diagnosis>': [
+            'Enable',
+            'Disable'
+        ]
+    },
+    {
+        '<override>': []
+    },
+    {
+        '<reset>': []
+    },
+    {
+        '<advanced>': [
+            {
+                '<Fast Boot>': [
+                    {'Quick Boot': ['Enabled', 'Disabled']},
+                    {'Turbo Boot': ['Enabled', 'Disabled']}
+				]
+            },
+            {
+                '<Normal Boot>': {
+                    'Verbose Boot': ['Enabled', 'Disabled'],
+                    'Diagnostic Boot': ['Enabled', 'Disabled']
+                }
+            },
+            {
+                '<Safe Boot>': {
+                    'Minimal Boot': ['Enabled', 'Disabled'],
+                    'Network Boot': ['Enabled', 'Disabled']
+                }
+            }
+        ]
+    }
+];
+
 	
 	// @ts-ignore
 	let modalStack = [] // contains objects of modal options
@@ -64,13 +118,15 @@
 						currentModal = tempArrValues[modalIndex];
 					} else if (typeof(tempArrValues[modalIndex]) === 'string') {
 						// do nothing just copy the  value
+						if(tempArrValues[modalIndex] === '[Diagnosis log]'){
+							// to do
+							window.location.href = 'systemBootTimeOut/diagnosis'
+						}
 						copyToClipBoard();
 					}
 					modalZIndex += 1;
 					modalIndex = 0;
-				} else // @ts-ignore
-				{
-					//@ts-expect-error
+				} else {
 					modalStack.push(modalOptions[active])
 					$showModal[active] = true;
 				}		
@@ -134,15 +190,6 @@
 		return arrValues;
 	}
 
-	// Copy alert Modal implementation
-	/*
-	let timeOut = 2000;
-	let showCopyAlert = writable(true);
-	function executeCopyAlert() {
-		// to do
-		showCopyAlert.set(true);
-	}
-	*/
 </script>
 
 <section class="relative h-screen w-full bg-[#9c9a9d] font-IBM cursor-none">
@@ -167,6 +214,7 @@
 			<p>Diagnosis Scan</p>
 			<p>Manual Override</p>
 			<p>System Reset</p>
+			<p>Advanced Options</p>
 		</div>
 		<div class="boot-options flex basis-1/3 flex-col gap-y-4 p-10">
 			{#each values as key, index}
