@@ -19,7 +19,7 @@
 		<div class={`md: flex items-center justify-center px-6 py-2 md:px-10 md:py-6 ${y > 0 ? 'backdrop-blur-xl' : ''} transition-all duration-150 ease-out`}>
 			<div class="absolute left-6 flex items-center gap-x-2">
 				<a href="/">
-					<img src="/assets/logo.png" alt="TASC logo" class="w-20 brightness-125 contrast-125" />
+					<img src="/assets/logoIncridea.png" alt="TASC logo" class="w-20 brightness-125 contrast-125" />
 				</a>
 			</div>
 			<ul class="flex flex-wrap items-center space-x-6 md:text-lg">
@@ -43,7 +43,7 @@
 	<div class={`fixed z-50 flex w-full pb-2 pt-4  ${y > 0 ? 'backdrop-blur-xl' : ''} transition-all duration-150 ease-out md:hidden`}>
 		<div>
 			<a href="/" class="flex items-center"
-				><img src="/assets/logo.png" alt="TASC logo" class="w-12" />
+				><img src="/assets/incrideaLogo.png" alt="TASC logo" class="w-12" />
 				<!-- <h1 class="text-xl font-bold text-green-900">TASC</h1> -->
 			</a>
 		</div>
