@@ -10,7 +10,7 @@
 			keyEvent(event);
 		});
 
-		function keyEvent (event : any) {
+		function keyEvent(event: any) {
 			if (event.key === 'ArrowUp') {
 				active = Math.max(active - 1, 0);
 				updateActiveItem();
@@ -44,7 +44,7 @@
 
 <section class="h-screen w-full cursor-none bg-[#9c9a9d] font-IBM">
 	<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
-		<div class="flex h-20 w-[99%] items-center justify-center border border-x-4 border-white">
+		<div class="flex h-20 w-full items-center justify-center border border-x-4 border-white">
 			<h1 class="text-center text-4xl font-medium text-white">Advanced Boot Options</h1>
 		</div>
 	</header>
@@ -66,7 +66,7 @@
 		</div>
 	</body>
 	<footer class="flex h-[16%] w-full items-center justify-center border bg-[#000069] text-white">
-		<div class="flex h-32 w-[99%] items-center justify-center border border-x-4 border-white">
+		<div class="flex h-32 w-full items-center justify-center border border-x-4 border-white">
 			<div class="flex h-[65%] w-full items-end justify-start gap-x-96 bg-black px-6">
 				<p class="text-3xl tracking-widest">&#x2191&#x2193=Move Highlight</p>
 				<p class="text-3xl tracking-widest">&ltEnter&gt=Complete Entry</p>
