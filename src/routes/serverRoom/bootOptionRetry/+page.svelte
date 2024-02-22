@@ -1,7 +1,7 @@
 <script>
 	let active = 0;
 	const values = ['[S]', '<UEFI>', '<UEFI>', '<Disabled>', '<Disabled>', 'disabled'];
-	const information = ['All functions on System boot timeout', 'Test System booting', 'change fast boot', 'Diagonise system booting', 'Override booting', 'Reset system booting'];
+	const information = ['All functions on System boot retry', 'Test System booting', 'change fast boot', 'Diagonise system booting', 'Override booting', 'Reset system booting'];
 	let showModal = writable(new Array(values.length).fill(false));
 
 	import Modal from '$lib/components/LIR/Modal.svelte';
@@ -10,7 +10,7 @@
 	import { desiredString } from '../desiredString';
 	import { randomMessage } from '../randomMessage';
 
-	const modalOptions = [{ '[S]': ['Normal Timeout', { '<Test>': ['value one', 'value two'] }, 'Fast Boot', '<Diagnosis log>', '<Manual Override>', 'System Reset'] }, { '<UEFI>': ['safe mode', { 'user mode': ['one', 'two'] }, 'fast mode', 'dev mode'] }, { '<Disabled>': ['System test', 'Server test', 'Diagnosis test'] }, { '<Enabled>': ['Enable', 'Disable'] }, { '<UEFI>': [] }, { '<Disabled>': [] }];
+	const modalOptions = [{ '[S]': ['Normal Timeout', { '<Test>': ['value one', 'value two'] }, 'Fast Boot', '[Diagnosis log]', '<Manual Override>', 'System Reset'] }, { '<UEFI>': ['safe mode', { 'user mode': ['one', 'two'] }, 'fast mode', 'dev mode'] }, { '<Disabled>': ['System test', 'Server test', 'Diagnosis test'] }, { '<Enabled>': ['Enable', 'Disable'] }, { '<UEFI>': [] }, { '<Disabled>': [] }];
 	// @ts-ignore
 	let modalStack = []; // contains objects of modal options
 	// copy pop up
@@ -53,7 +53,23 @@
 						modalIndex = 0;
 					} else if (typeof tempArrValues[modalIndex] === 'string') {
 						// do nothing just copy the  value
-						if (tempArrValues[modalIndex] === '[Diagnosis log]') {
+						if (tempArrValues[modalIndex] === '<Manual Override>') {
+							const valueToCopy = desiredString;
+							navigator.clipboard
+								.writeText(valueToCopy)
+								.then(() => {
+									showPopUp = true;
+									setTimeout(() => {
+										showPopUp = false;
+									}, 1000);
+								}) // value not shown cuz let the players navigate multiple times in search of the code
+								.catch((error) => console.error('Unable to copy value:', error));
+								$showModal[active] = false;
+								currentModal = modalOptions[active];
+								modalStack = [];
+								modalIndex = 0;
+								modalZIndex = 0;
+						}else if (tempArrValues[modalIndex] === '[Diagnosis log]') {
 							// to do
 							window.location.href = 'systemBootTimeOut/diagnosis';
 						} else {
