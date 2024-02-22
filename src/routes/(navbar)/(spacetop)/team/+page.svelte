@@ -9,7 +9,6 @@
 	import { copy } from 'svelte-copy';
 
 	let data: TeamData | null = null;
-
 	let teamURL = $userProfileData?.lir;
 
 	async function getData(teamURL: string) {
@@ -99,7 +98,7 @@
 	{/if}
 {:else if $user && $userData && $userProfileData && !$userProfileData.lir}
 	<div class="flex h-full w-full flex-col items-center justify-center space-y-6">
-		<JoinTeam />
+		<!-- <JoinTeam /> -->
 		<CreateTeam />
 	</div>
 {:else}
