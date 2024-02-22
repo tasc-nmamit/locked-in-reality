@@ -46,7 +46,7 @@
 		}
 		// Add more sections as needed
 	];
-	// @ts-expect-error
+
 	let modalStack = []; // contains objects of modal options
 
 	let showPopUp = false;
@@ -57,16 +57,11 @@
 			event.preventDefault();
 			if (event.key === 'Escape') {
 				if ($showModal[active] === true) {
-					// @ts-ignore
-					modalStack.pop();
-					if (modalStack.length > 0) {
-						// @ts-ignore
-						currentModal = modalStack[modalStack.length - 1];
-					} else if (modalStack.length === 0) {
-						$showModal[active] = false;
-					}
+					$showModal[active] = false;
+					currentModal = modalOptions[active];
+					modalStack = [];
 					modalIndex = 0;
-					modalZIndex -= 1;
+					modalZIndex = 0;
 				} else {
 					window.location.href = '/serverRoom';
 				}
@@ -87,19 +82,29 @@
 			} else if (event.key === 'Enter') {
 				if ($showModal[active]) {
 					if (typeof tempArrValues[modalIndex] === 'object') {
-						// @ts-ignore
 						modalStack.push(tempArrValues[modalIndex]);
-						// @ts-ignore
 						currentModal = tempArrValues[modalIndex];
+						modalZIndex += 1;
+						modalIndex = 0;
 					} else if (typeof tempArrValues[modalIndex] === 'string') {
 						// do nothing just copy the  value
-						copyToClipBoard();
+						if (tempArrValues[modalIndex] === '[Diagnosis log]') {
+							// to do
+							window.location.href = 'systemBootTimeOut/diagnosis';
+						} else {
+							copyToClipBoard();
+							$showModal[active] = false;
+							currentModal = modalOptions[active];
+							modalStack = [];
+							modalIndex = 0;
+							modalZIndex = 0;
+						}
 					}
+				} else {
+					modalStack.push(modalOptions[active]);
+					currentModal = modalOptions[active];
 					modalZIndex += 1;
 					modalIndex = 0;
-				} // @ts-ignore
-				else {
-					modalStack.push(modalOptions[active]);
 					$showModal[active] = true;
 				}
 			}

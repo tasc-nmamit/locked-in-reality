@@ -10,9 +10,8 @@
 	import { randomMessage } from '../randomMessage';
 
 	const modalOptions = [{ '[S]': ['Normal Timeout', { '<Test>': ['value one', 'value two'] }, 'Fast Boot', '<Diagnosis log>', '<Manual Override>', 'System Reset'] }, { '<UEFI>': ['safe mode', { 'user mode': ['one', 'two'] }, 'fast mode', 'dev mode'] }, { '<Disabled>': ['System test', 'Server test', 'Diagnosis test'] }, { '<Enabled>': ['Enable', 'Disable'] }, { '<UEFI>': [] }, { '<Disabled>': [] }];
-	/**
-	 * @type {({ '[S]': string[]; '<UEFI>'?: undefined; '<Disabled>'?: undefined; '<Enabled>'?: undefined; } | { '<UEFI>': string[]; '[S]'?: undefined; '<Disabled>'?: undefined; '<Enabled>'?: undefined; } | { '<Disabled>': string[]; '[S]'?: undefined; '<UEFI>'?: undefined; '<Enabled>'?: undefined; } | { '<Enabled>': string[]; '[S]'?: undefined; '<UEFI>'?: undefined; '<Disabled>'?: undefined; })[]}
-	 */
+
+	// @ts-ignore
 	let modalStack = []; // contains objects of modal options
 
 	// copy pop up
@@ -24,14 +23,11 @@
 			event.preventDefault();
 			if (event.key === 'Escape') {
 				if ($showModal[active] === true) {
-					modalStack.pop();
-					if (modalStack.length > 0) {
-						currentModal = modalStack[modalStack.length - 1];
-					} else if (modalStack.length === 0) {
-						$showModal[active] = false;
-					}
+					$showModal[active] = false;
+					currentModal = modalOptions[active];
+					modalStack = [];
 					modalIndex = 0;
-					modalZIndex -= 1;
+					modalZIndex = 0;
 				} else {
 					window.location.href = '/serverRoom';
 				}
@@ -54,15 +50,27 @@
 					if (typeof tempArrValues[modalIndex] === 'object') {
 						modalStack.push(tempArrValues[modalIndex]);
 						currentModal = tempArrValues[modalIndex];
+						modalZIndex += 1;
+						modalIndex = 0;
 					} else if (typeof tempArrValues[modalIndex] === 'string') {
 						// do nothing just copy the  value
-						copyToClipBoard();
+						if (tempArrValues[modalIndex] === '[Diagnosis log]') {
+							// to do
+							window.location.href = 'systemBootTimeOut/diagnosis';
+						} else {
+							copyToClipBoard();
+							$showModal[active] = false;
+							currentModal = modalOptions[active];
+							modalStack = [];
+							modalIndex = 0;
+							modalZIndex = 0;
+						}
 					}
+				} else {
+					modalStack.push(modalOptions[active]);
+					currentModal = modalOptions[active];
 					modalZIndex += 1;
 					modalIndex = 0;
-				} else {
-					//@ts-expect-error
-					modalStack.push(modalOptions[active]);
 					$showModal[active] = true;
 				}
 			}
@@ -125,16 +133,6 @@
 		}
 		return arrValues;
 	}
-
-	// Copy alert Modal implementation
-	/*
-	let timeOut = 2000;
-	let showCopyAlert = writable(true);
-	function executeCopyAlert() {
-		// to do
-		showCopyAlert.set(true);
-	}
-	*/
 </script>
 
 <section class="relative h-screen w-full cursor-none bg-[#9c9a9d] font-IBM">

@@ -22,16 +22,11 @@
 			event.preventDefault();
 			if (event.key === 'Escape') {
 				if ($showModal[active] === true) {
-					// @ts-ignore
-					modalStack.pop();
-					if (modalStack.length > 0) {
-						// @ts-ignore
-						currentModal = modalStack[modalStack.length - 1];
-					} else if (modalStack.length === 0) {
-						$showModal[active] = false;
-					}
+					$showModal[active] = false;
+					currentModal = modalOptions[active];
+					modalStack = [];
 					modalIndex = 0;
-					modalZIndex -= 1;
+					modalZIndex = 0;
 				} else {
 					window.location.href = '/serverRoom';
 				}
@@ -54,27 +49,27 @@
 					if (typeof tempArrValues[modalIndex] === 'object') {
 						modalStack.push(tempArrValues[modalIndex]);
 						currentModal = tempArrValues[modalIndex];
+						modalZIndex += 1;
+						modalIndex = 0;
 					} else if (typeof tempArrValues[modalIndex] === 'string') {
-						// do nothing just copy the value
-						if (tempArrValues[modalIndex] === '<Manual Override>') {
-							const valueToCopy = desiredString;
-							navigator.clipboard
-								.writeText(valueToCopy)
-								.then(() => {
-									showPopUp = true;
-									setTimeout(() => {
-										showPopUp = false;
-									}, 1000);
-								}) // value not shown cuz let the players navigate multiple times in search of the code
-								.catch((error) => console.error('Unable to copy value:', error));
+						// do nothing just copy the  value
+						if (tempArrValues[modalIndex] === '[Diagnosis log]') {
+							// to do
+							window.location.href = 'systemBootTimeOut/diagnosis';
 						} else {
 							copyToClipBoard();
+							$showModal[active] = false;
+							currentModal = modalOptions[active];
+							modalStack = [];
+							modalIndex = 0;
+							modalZIndex = 0;
 						}
 					}
-					modalZIndex += 1;
-					modalIndex = 0;
 				} else {
 					modalStack.push(modalOptions[active]);
+					currentModal = modalOptions[active];
+					modalZIndex += 1;
+					modalIndex = 0;
 					$showModal[active] = true;
 				}
 			}
@@ -149,7 +144,7 @@
 	{/if}
 	<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
 		<div class="flex h-20 w-full items-center justify-center border border-x-4 border-white">
-			<h1 class="text-center text-4xl font-medium text-white">System Boot Time Out</h1>
+			<h1 class="text-center text-4xl font-medium text-white">Boot Option Retry</h1>
 		</div>
 	</header>
 	<body class="flex h-[74%] w-full flex-wrap bg-inherit text-3xl font-[600] tracking-normal text-black">
