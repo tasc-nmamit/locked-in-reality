@@ -48,7 +48,7 @@
         '<reset>': []
     },
     {
-        '<advanced>': [
+        '<options>': [
             {
                 '<Fast Boot>': [
                     {'Quick Boot': ['Enabled', 'Disabled']},
@@ -84,16 +84,11 @@
 			event.preventDefault();
 			if (event.key === 'Escape') {
 				if ($showModal[active] === true){
-					// @ts-ignore
-					modalStack.pop();
-					if (modalStack.length > 0) {
-						// @ts-ignore
-						currentModal = modalStack[modalStack.length - 1];
-					} else if (modalStack.length === 0) {
-						$showModal[active] = false;
-					}
+					$showModal[active] = false;
+					currentModal = modalOptions[active]
+					modalStack = [];
 					modalIndex = 0;
-					modalZIndex -= 1
+					modalZIndex = 0
 				} else {
 					window.location.href = '/serverRoom';
 				}
@@ -116,18 +111,27 @@
 					if (typeof(tempArrValues[modalIndex]) === 'object') {
 						modalStack.push(tempArrValues[modalIndex]);
 						currentModal = tempArrValues[modalIndex];
+						modalZIndex += 1;
+						modalIndex = 0;
 					} else if (typeof(tempArrValues[modalIndex]) === 'string') {
 						// do nothing just copy the  value
 						if(tempArrValues[modalIndex] === '[Diagnosis log]'){
 							// to do
 							window.location.href = 'systemBootTimeOut/diagnosis'
+						}else {
+							copyToClipBoard();
+							$showModal[active] = false;
+							currentModal = modalOptions[active]
+							modalStack = [];
+							modalIndex = 0;
+							modalZIndex = 0
 						}
-						copyToClipBoard();
 					}
-					modalZIndex += 1;
-					modalIndex = 0;
 				} else {
 					modalStack.push(modalOptions[active])
+					currentModal = modalOptions[active]
+					modalZIndex += 1;
+					modalIndex = 0;
 					$showModal[active] = true;
 				}		
 			}
@@ -170,7 +174,7 @@
 	// states to keep track of the modal
 	let modalZIndex = 0
 	let modalIndex = 0
-	$: currentModal = modalOptions[active]
+	let currentModal = modalOptions[active] 
 	$: title= Object.keys(currentModal)[0]
 	$: tempArrValues = Object.values(currentModal)[0]
 	$: arrValues = updateArrValues(tempArrValues)

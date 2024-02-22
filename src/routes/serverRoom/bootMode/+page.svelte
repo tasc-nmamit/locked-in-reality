@@ -23,13 +23,16 @@
 	}
 
 	function checkForSuccess() { 	
-		let str1 = textareaValue;
+		let str1:string;
+		setTimeout(() => {
+			str1 = textareaValue;
+		},500)
 
 		setTimeout(() => {
 			textareaValue += `
 	
 compiling ...`;
-		},1000)
+		},500)
 
 		setTimeout(() => {
 			if (convertString(str1) === convertString(desiredString)) {
