@@ -2,12 +2,17 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import * as Card from '$lib/components/ui/card';
+	import * as Select from '$lib/components/ui/select';
 	import { Html5Qrcode } from 'html5-qrcode';
 	import { onMount } from 'svelte';
+	import { Label } from '$lib/components/ui/label';
+
+	const teamList = ['Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5'];
+	let teamID: { value: string; label: string } = { value: '', label: '' };
 
 	let scanning = false;
 	let html5Qrcode: Html5Qrcode;
-	let info: string = '';
+	let info: string | {} = '';
 
 	let status: 'inside' | 'outside' = 'outside';
 
@@ -17,6 +22,11 @@
 	}
 
 	function start() {
+		if (!teamID.value) {
+			alert('Please select your team');
+			return;
+		}
+
 		html5Qrcode.start(
 			{ facingMode: 'environment' },
 			{
@@ -34,8 +44,22 @@
 		scanning = false;
 	}
 
+	function isJson(str: string) {
+		try {
+			JSON.parse(str);
+		} catch (e) {
+			return false;
+		}
+		return true;
+	}
+
 	async function onScanSuccess(decodedText: string, decodedResult: any) {
-		info = decodedText;
+		if (isJson(decodedText)) {
+			info = JSON.parse(decodedText);
+		} else {
+			info = decodedText;
+		}
+
 		console.log('decoded Text', decodedText, 'decoded Result', decodedResult);
 		// await updateStatus(decodedText);
 	}
@@ -70,6 +94,33 @@
 	}
 </script>
 
+{#if !teamID.value}
+	<Select.Root bind:selected={teamID} portal={null}>
+		<div class="flex items-start justify-center gap-6 rounded-lg p-8 align-middle">
+			<Select.Trigger class="w-[180px]">
+				<Select.Value placeholder="Select your team" />
+			</Select.Trigger>
+		</div>
+		<Select.Content>
+			<Select.Group>
+				<Select.Label>Select Your Team</Select.Label>
+				<!-- <Select.Item value={''} label={''} disabled={true}>None</Select.Item> -->
+				{#each teamList as team}
+					<Select.Item value={team} label={team}>{team}</Select.Item>
+				{/each}
+			</Select.Group>
+		</Select.Content>
+		<Select.Input name="team" />
+	</Select.Root>
+{:else}
+	<div class="flex flex-wrap items-start justify-center gap-6 rounded-lg p-8 align-middle">
+		<Label class="inline-flex h-10 items-center justify-center whitespace-nowrap px-4 py-2 text-lg font-semibold">{teamID.label}</Label>
+		<Button variant="secondary" on:click={() => (teamID = { value: '', label: '' })}>Change</Button>
+	</div>
+{/if}
+
+<hr class="w-full" />
+
 <div class="flex flex-wrap items-start justify-center gap-6 rounded-lg p-8">
 	<Card.Root class="w-[350px]">
 		<Card.Header>
@@ -95,7 +146,12 @@
 			<!-- <Card.Description></Card.Description> -->
 		</Card.Header>
 		<Card.Content>
-			{#if info}
+			{#if info && info['key'] && info['text']}
+				<div class="space-y-2">
+					<p class="text-lg font-semibold">Key -> {info['key']}</p>
+					<p class="text-lg font-semibold">{info['text']}</p>
+				</div>
+			{:else if info}
 				<div class="space-y-2">
 					<p class="text-lg font-semibold">{info}</p>
 				</div>
