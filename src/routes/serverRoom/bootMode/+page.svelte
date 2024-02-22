@@ -132,10 +132,11 @@ failed`;
 	</body>
 	<footer class="flex h-[16%] w-full items-center justify-center border bg-[#000069] text-white">
 		<div class="flex h-32 w-[99%] items-center justify-center border border-x-4 border-white">
-			<div class="flex h-[65%] w-full items-end justify-start gap-x-96 bg-black px-6">
+			<div class="flex h-[65%] w-full items-end justify-between bg-black px-6 text-nowrap">
 				<p class="text-3xl tracking-widest">&#x2191&#x2193=Move Highlight</p>
 				<p class="text-3xl tracking-widest">&ltEnter&gt=Complete Entry</p>
 				<p class="text-3xl tracking-widest">ESC=Exit Entry</p>
+				<p class="text-3xl tracking-widest">Tab=switch focus</p>
 			</div>
 		</div>
 	</footer>
