@@ -1,78 +1,25 @@
 <script>
 	let active = 0;
-	const values = ['[S]', '<UEFI>', '<scan>', '<diagnosis>', '<override>' , '<reset>' , '<options>'];
+	const values = ['[S]', '<UEFI>', '<UEFI>', '<Disabled>', '<Disabled>' , 'disabled'];
 	const information = ['All functions on System boot timeout', 'Test System booting', 'change fast boot', 'Diagonise system booting', 'Override booting','Reset system booting'];
 	let showModal = writable(new Array(values.length).fill(false));
-
+	
+	import { writable } from 'svelte/store';
 	import Modal from '$lib/components/LIR/Modal.svelte';
 	import { onMount } from 'svelte';
-	import { writable } from 'svelte/store';
 	import { randomMessage } from '../randomMessage';
 
 	const modalOptions = [
-    {
-        '[S]': [
-            'Normal Timeout',
-            {'<Test>': ['Manual Test', 'Automatic test' , 'semi-automatic test']},
-            'Fast Boot',
-            '[Diagnosis log]',
-            {'<Manual Override>' : []},
-            {'System Reset' : []}
-        ]
-    },
-    {
-        '<UEFI>': [
-            'safe mode',
-            {'<user mode>': ['admin', 'user']},
-            'fast mode',
-            'dev mode'
-        ]
-    },
-    {
-        '<scan>': [
-            'System test',
-            'Server test',
-            'Diagnosis test'
-        ]
-    },
-    {
-        '<diagnosis>': [
-            'Enable',
-            'Disable'
-        ]
-    },
-    {
-        '<override>': []
-    },
-    {
-        '<reset>': []
-    },
-    {
-        '<options>': [
-            {
-                '<Fast Boot>': [
-                    {'Quick Boot': ['Enabled', 'Disabled']},
-                    {'Turbo Boot': ['Enabled', 'Disabled']}
-				]
-            },
-            {
-                '<Normal Boot>': [
-                    {'Verbose Boot': ['Enabled', 'Disabled']},
-                    {'Diagnostic Boot': ['Enabled', 'Disabled']}
-				]
-            },
-            {
-                '<Safe Boot>': [
-                    {'Minimal Boot': ['Enabled', 'Disabled']},
-                    {'Network Boot': ['Enabled', 'Disabled']}
-				]
-            }
-        ]
-    }
-];
-
-	
-	// @ts-ignore
+		{'[S]' : ['Normal Timeout', {'<Test>' : ['value one' , 'value two']}, 'Fast Boot', '<Diagnosis log>', '<Manual Override>', 'System Reset']},
+		{'<UEFI>' : ['safe mode', {'user mode' : ["one" , "two"]}, 'fast mode', 'dev mode']},
+		{'<Disabled>' : ['System test' , 'Server test' , 'Diagnosis test']},
+		{'<Enabled>' : ['Enable' , 'Disable']},
+		{'<UEFI>' : []},
+		{'<Disabled>' : []},
+		]
+	/**
+	 * @type {({ '[S]': string[]; '<UEFI>'?: undefined; '<Disabled>'?: undefined; '<Enabled>'?: undefined; } | { '<UEFI>': string[]; '[S]'?: undefined; '<Disabled>'?: undefined; '<Enabled>'?: undefined; } | { '<Disabled>': string[]; '[S]'?: undefined; '<UEFI>'?: undefined; '<Enabled>'?: undefined; } | { '<Enabled>': string[]; '[S]'?: undefined; '<UEFI>'?: undefined; '<Disabled>'?: undefined; })[]}
+	 */
 	let modalStack = [] // contains objects of modal options
 
 	// copy pop up
@@ -84,11 +31,14 @@
 			event.preventDefault();
 			if (event.key === 'Escape') {
 				if ($showModal[active] === true){
-					$showModal[active] = false;
-					currentModal = modalOptions[active]
-					modalStack = [];
+					modalStack.pop();
+					if (modalStack.length > 0) {
+						currentModal = modalStack[modalStack.length - 1];
+					} else if (modalStack.length === 0) {
+						$showModal[active] = false;
+					}
 					modalIndex = 0;
-					modalZIndex = 0
+					modalZIndex -= 1
 				} else {
 					window.location.href = '/serverRoom';
 				}
@@ -108,30 +58,18 @@
 				}
 			} else if (event.key === 'Enter') {
 				if ($showModal[active]) {
-					if (typeof tempArrValues[modalIndex] === 'object') {
+					if (typeof(tempArrValues[modalIndex]) === 'object') {
 						modalStack.push(tempArrValues[modalIndex]);
 						currentModal = tempArrValues[modalIndex];
-						modalZIndex += 1;
-						modalIndex = 0;
 					} else if (typeof(tempArrValues[modalIndex]) === 'string') {
 						// do nothing just copy the  value
-						if(tempArrValues[modalIndex] === '[Diagnosis log]'){
-							// to do
-							window.location.href = 'systemBootTimeOut/diagnosis'
-						}else {
-							copyToClipBoard();
-							$showModal[active] = false;
-							currentModal = modalOptions[active]
-							modalStack = [];
-							modalIndex = 0;
-							modalZIndex = 0
-						}
+						copyToClipBoard();
 					}
-				} else {
-					modalStack.push(modalOptions[active])
-					currentModal = modalOptions[active]
 					modalZIndex += 1;
 					modalIndex = 0;
+				} else {
+					//@ts-expect-error
+					modalStack.push(modalOptions[active])
 					$showModal[active] = true;
 				}		
 			}
@@ -140,6 +78,7 @@
 		// copy function
 		function copyToClipBoard () {
 			const valueToCopy = randomMessage();
+				
 				navigator.clipboard
 					.writeText(valueToCopy)
 					.then(() => {
@@ -174,7 +113,7 @@
 	// states to keep track of the modal
 	let modalZIndex = 0
 	let modalIndex = 0
-	let currentModal = modalOptions[active] 
+	$: currentModal = modalOptions[active]
 	$: title= Object.keys(currentModal)[0]
 	$: tempArrValues = Object.values(currentModal)[0]
 	$: arrValues = updateArrValues(tempArrValues)
@@ -185,21 +124,30 @@
 	function updateArrValues(tempArrValues) {
 		let arrValues = [];
 		for (let i = 0; i < tempArrValues.length; i++) {
-			if (typeof tempArrValues[i] === 'object') {
+			if (typeof(tempArrValues[i]) === 'object') {
 				arrValues.push(Object.keys(tempArrValues[i])[0]);
-			} else if (typeof tempArrValues[i] === 'string') {
+			} else if (typeof(tempArrValues[i]) === 'string') {
 				arrValues.push(tempArrValues[i]);
 			}
 		}
 		return arrValues;
 	}
 
+	// Copy alert Modal implementation
+	/*
+	let timeOut = 2000;
+	let showCopyAlert = writable(true);
+	function executeCopyAlert() {
+		// to do
+		showCopyAlert.set(true);
+	}
+	*/
 </script>
 
-<section class="relative h-screen w-full cursor-none bg-[#9c9a9d] font-IBM">
+<section class="relative h-screen w-full bg-[#9c9a9d] font-IBM cursor-none">
 	{#if $showModal[active]}
 		{#if modalStack.length > 0}
-			<Modal {title} {arrValues} {showModal} message={'LOL you are not authorized to change it'} curr={active} />
+			<Modal title={title} arrValues={arrValues} {showModal} message={"LOL you are not authorized to change it"} curr={active} />
 		{/if}
 	{/if}
 	{#if showPopUp}		
@@ -211,14 +159,13 @@
 		</div>
 	</header>
 	<body class="flex h-[74%] w-full flex-wrap bg-inherit text-3xl font-[600] tracking-normal text-black">
-		<div class="flex basis-1/3 flex-col gap-y-4 p-10">
+		<div class="flex basis-1/3 flex-col p-10 gap-y-4">
 			<p>Functions</p>
 			<p>Test</p>
 			<p>Fast Boot</p>
 			<p>Diagnosis Scan</p>
 			<p>Manual Override</p>
 			<p>System Reset</p>
-			<p>Advanced Options</p>
 		</div>
 		<div class="boot-options flex basis-1/3 flex-col gap-y-4 p-10">
 			{#each values as key, index}
