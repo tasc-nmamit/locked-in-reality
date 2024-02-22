@@ -8,6 +8,7 @@
 
 	export let data: PageData;
 
+	let questionURLBase = '/LIR/quiz';
 	let score = 0;
 	let currentQuestion = 0;
 	let questionCounter = 0;
@@ -16,7 +17,7 @@
 	let penaltyTime: number = 0;
 	let hintSelected: boolean[] = new Array(data.list.length).fill(false);
 	let hintView = false;
-
+	let dataTeam: TeamData | null = null;
 	function generateRandomNumber() {
 		const randomNumber = Math.random();
 		const randomNumberInRange = Math.floor(randomNumber * 5) + 1;
@@ -32,8 +33,9 @@
 	//@ts-expect-error
 	function checkMatch(event) {
 		const enteredOtp = event.detail.otp;
-		if (enteredOtp === '1234567890') {
+		if (enteredOtp === '1369443186') {
 			stopTimer();
+			alert('success, your time has been recorded!');
 		} else {
 			// Do something if OTP doesn't match
 			penaltyTime += 5;
@@ -103,16 +105,17 @@
 		redirect(300, path);
 	}
 
+	import type { TeamData } from '$lib/types/TeamData';
 	import { onMount } from 'svelte';
 
-	function confirmReload(event: { preventDefault: () => void; returnValue: string; }) {
+	function confirmReload(event: { preventDefault: () => void; returnValue: string }) {
 		event.preventDefault();
-  	}
+	}
 
 	onMount(() => {
 		window.addEventListener('beforeunload', confirmReload);
 		return () => {
-		window.removeEventListener('beforeunload', confirmReload);
+			window.removeEventListener('beforeunload', confirmReload);
 		};
 	});
 </script>
@@ -139,7 +142,7 @@
 			</div>
 		{:else}
 			<div class="mx-auto flex w-full flex-col items-center gap-y-4">
-				<div class="relative z-10 flex min-w-[36rem] max-w-xl flex-col items-center gap-4 rounded-lg border-[1px] border-white bg-black/5 p-10 backdrop-blur-md">
+				<div class="relative z-10 flex min-w-[36rem] max-w-xl flex-col items-center gap-4 rounded-lg border-[1px] border-white bg-black p-10">
 					<!-- hint alert dialog -->
 					<div class="z-20 ml-auto">
 						<AlertDialog.Root>
@@ -195,25 +198,26 @@
 					<!-- hint alert dialog end -->
 
 					<h1 class="self-start text-left text-xl font-medium">
-						{currentQuestion + 1}. {data.list[currentQuestion].question}
+						<!-- {currentQuestion + 1}. {data.list[currentQuestion].question} -->
+						<img src={`${questionURLBase}/${currentQuestion + 1}.jpg`} alt="questionImage" class="w-full" />
 					</h1>
 					<Input type="text" placeholder="Type your answer" class="border-gray-500" bind:value={data.answers[currentQuestion].answer} on:input={handleInputChange} />
 					{#if data.answers[currentQuestion].answered}
 						{#if data.answers[currentQuestion].answer.toLowerCase().trim() === data.list[currentQuestion].answer.toLowerCase().trim()}
-							<p class="text-white">Decryption Code :{data.list[currentQuestion].key}</p>
+							<p class="text-center text-white"><span class="font-semibold text-purple-500">Success!</span><br />Decryption Code : {data.list[currentQuestion].key}</p>
 						{:else}
 							<p class="text-white">Error Wrong Code!</p>
 						{/if}
 					{/if}
 
-					<p>Questions Attempted: {questionCounter}/{data.list.length}</p>
+					<!-- <p>Questions Attempted: {questionCounter}/{data.list.length}</p> -->
 					<div class="flex flex-row flex-wrap items-center justify-center gap-3">
 						{#each { length: data.list.length } as _, i}
 							<button
-								class="btn w-8 {data.answers[i].answered && currentQuestion !== i ? 'btn-warning' : 'btn-outline'} {currentQuestion === i ? 'btn-active' : ''}"
+								class="btn flex h-8 w-6 items-center justify-center {data.answers[i].answered && currentQuestion !== i ? 'btn-warning' : 'btn-outline'} {currentQuestion === i ? 'btn-active' : ''}"
 								on:click={() => {
 									currentQuestion = i;
-								}}>{i + 1}</button
+								}}><p>{i + 1}</p></button
 							>
 						{/each}
 					</div>
@@ -266,16 +270,39 @@
 		align-items: center;
 		justify-items: center;
 	}
+	/* 
+1.Synthentity
+2.512
+3.gofai
+4.Turing
+5.ARIES
+6.Firewall
+7.boolean
+8.prompt
+9.server
+10.variable
 
+1.caesar cipher
+2. [no hint]
+3.stack operation
+4.linked list
+5.unscramble and stack the words vertically in a certain way that reveals the secret word
+6.protective barrier for network
+7.It's a logical condition that evaluates to either true or false.
+8.The ASCII value of "a"=97
+9.central point in a network, providing services and resources to multiple users and devices
+10.It represents a memory location where data can be stored.
+
+*/
 	.background {
 		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background-image: url('/LIR/1.jpg');
+		background-image: url('/LIR/3.webp');
 		background-size: cover; /* Apply blur to the background image */
-		background-color: rgba(0, 0, 0, 0.6);
+		filter: blur(3px);
 	}
 	.background::before {
 		content: '';
