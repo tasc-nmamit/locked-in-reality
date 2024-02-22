@@ -57,7 +57,6 @@ failed`;
 	async function pasteFromClipboard() {
 		const text = (await navigator.clipboard.readText()).trim();
 		textareaValue = text;
-		checkForSuccess();
 	}
 	
 	function convertToManual () {
@@ -93,7 +92,10 @@ failed`;
             } else if (event.key === 'Enter') {
 				event.preventDefault();
 				if (focusOn === 'textarea') {
-					pasteFromClipboard();
+					if (textareaValue.trimEnd() === "") {
+						pasteFromClipboard();
+					}
+					checkForSuccess();
 				} else {
 					convertToManual();
 				}
@@ -120,7 +122,7 @@ failed`;
 				<h2>To unlock manual <u>Run the code</u></h2>
 			</div>
 			<div class="flex h-auto w-full flex-col items-center justify-center">
-				<textarea id="terminal" cols="30" rows="14" bind:value={textareaValue} bind:this={textareaElement} on:input={checkForSuccess} class="h-3/4 w-2/4 resize-none bg-black font-normal cursor-none"></textarea>
+				<textarea id="terminal" cols="30" rows="14" bind:value={textareaValue} bind:this={textareaElement} class="h-3/4 w-2/4 resize-none bg-black font-normal cursor-none"></textarea>
 			</div>
 			<!-- auth code -->
 			<div class="mt-12 flex w-full flex-row justify-center">
