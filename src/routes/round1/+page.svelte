@@ -18,6 +18,8 @@
 	let hintSelected: boolean[] = new Array(data.list.length).fill(false);
 	let hintView = false;
 	let dataTeam: TeamData | null = null;
+	let submitted = false;
+
 	function generateRandomNumber() {
 		const randomNumber = Math.random();
 		const randomNumberInRange = Math.floor(randomNumber * 5) + 1;
@@ -25,7 +27,7 @@
 	}
 
 	import CharInput from '$lib/components/LIR/SpecialInput.svelte';
-	import { success } from '$lib/components/Toast/toast';
+
 	import { redirect } from '@sveltejs/kit';
 	import { doc, getDoc, writeBatch } from 'firebase/firestore';
 
@@ -36,14 +38,18 @@
 		if (enteredOtp === '1369443186') {
 			stopTimer();
 			alert('success, your time has been recorded!');
+			submitted = true;
+			localStorage.setItem('submitted', JSON.stringify(submitted));
 		} else {
 			// Do something if OTP doesn't match
 			penaltyTime += 5;
+			localStorage.setItem('penaltyTime', penaltyTime.toString());
 			alert('Unsuccesfull attempt, You are punished');
 		}
 	}
 	function startTimer() {
 		startTime = new Date().getTime();
+		localStorage.setItem('startTime', startTime.toString());
 	}
 
 	async function stopTimer() {
@@ -60,8 +66,6 @@
 			time: seconds
 		});
 		await batch.commit();
-		console.log(seconds);
-		alert(`You took ${seconds} seconds to complete the quiz!`);
 	}
 
 	function prevClick() {
@@ -99,6 +103,7 @@
 		hintSelected[currentQuestion] = !hintSelected[currentQuestion];
 		hintView = false;
 		penaltyTime += 5;
+		localStorage.setItem('penaltyTime', penaltyTime.toString());
 	}
 
 	function causeRedirect(path: string) {
@@ -113,6 +118,24 @@
 	}
 
 	onMount(() => {
+		console.log($userData);
+		const storedSubmitted = localStorage.getItem('submitted');
+		const storedStartTime = localStorage.getItem('startTime');
+		const storedisStarted = localStorage.getItem('isStarted');
+		const storedPenaltyTime = localStorage.getItem('penaltyTime');
+
+		if (storedPenaltyTime) {
+			penaltyTime = parseInt(storedPenaltyTime);
+		}
+		if (storedisStarted) {
+			isStarted = JSON.parse(storedisStarted);
+		}
+		if (storedStartTime) {
+			startTime = parseInt(storedStartTime);
+		}
+		if (storedSubmitted) {
+			submitted = JSON.parse(storedSubmitted);
+		}
 		window.addEventListener('beforeunload', confirmReload);
 		return () => {
 			window.removeEventListener('beforeunload', confirmReload);
@@ -120,21 +143,27 @@
 	});
 </script>
 
-{#if !$userProfileData?.lir && !$userData && !user}
+<div class={`background -z-10 h-screen w-full`}></div>
+{#if !$userData || !$userProfileData}
 	<div class="flex h-full min-h-screen w-full flex-col items-center justify-center">
 		<h2 class="font-jbExtrabold pb-6 pt-4 text-4xl">You need to login and create a team first!</h2>
 		<a href="/"><Button>Goto Homepage</Button></a>
 	</div>
+{:else if submitted}
+	<div class="flex h-screen items-center justify-center">
+		<h1 class="text-3xl">Your time has been recorded!, If qualified you will be contacted soon!</h1>
+	</div>
 {:else}
 	<section class={`h-screen w-full`}>
 		<!-- <p class="absolute top-0 z-50">{JSON.stringify(data)}</p> -->
-		<div class={`background`}></div>
+
 		{#if !isStarted}
 			<div class="z-20 mx-auto flex flex-col items-center justify-center gap-4">
 				<button
 					class="mx-auto rounded-md border-[1px] border-white px-4 py-2 backdrop-blur-lg duration-500 ease-in-out hover:scale-110"
 					on:click={() => {
 						isStarted = true;
+						localStorage.setItem('isStarted', JSON.stringify(isStarted));
 						startTimer();
 					}}>Start Quiz!</button
 				>
@@ -196,7 +225,7 @@
 						</AlertDialog.Root>
 					</div>
 					<!-- hint alert dialog end -->
-
+			
 					<h1 class="self-start text-left text-xl font-medium">
 						<!-- {currentQuestion + 1}. {data.list[currentQuestion].question} -->
 						<img src={`${questionURLBase}/${currentQuestion + 1}.jpg`} alt="questionImage" class="w-full" />
@@ -270,30 +299,6 @@
 		align-items: center;
 		justify-items: center;
 	}
-	/* 
-1.Synthentity
-2.512
-3.gofai
-4.Turing
-5.ARIES
-6.Firewall
-7.boolean
-8.prompt
-9.server
-10.variable
-
-1.caesar cipher
-2. [no hint]
-3.stack operation
-4.linked list
-5.unscramble and stack the words vertically in a certain way that reveals the secret word
-6.protective barrier for network
-7.It's a logical condition that evaluates to either true or false.
-8.The ASCII value of "a"=97
-9.central point in a network, providing services and resources to multiple users and devices
-10.It represents a memory location where data can be stored.
-
-*/
 	.background {
 		position: absolute;
 		top: 0;
@@ -302,7 +307,7 @@
 		height: 100%;
 		background-image: url('/LIR/3.webp');
 		background-size: cover; /* Apply blur to the background image */
-		filter: blur(3px);
+		filter: blur(5px);
 	}
 	.background::before {
 		content: '';
