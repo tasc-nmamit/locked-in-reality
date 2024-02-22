@@ -186,10 +186,15 @@
 </script>
 
 <div class={`background -z-10 h-screen w-full`}></div>
-{#if !$userData || !$userProfileData}
+{#if !$user}
 	<div class="flex h-full min-h-screen w-full flex-col items-center justify-center">
-		<h2 class="font-jbExtrabold pb-6 pt-4 text-4xl">You need to login and create a team first!</h2>
+		<h2 class="font-jbExtrabold pb-6 pt-4 text-4xl">You need to login!</h2>
 		<a href="/"><Button>Goto Homepage</Button></a>
+	</div>
+{:else if !$userProfileData?.lir}
+	<div class="flex h-full min-h-screen w-full flex-col items-center justify-center">
+		<h2 class="font-jbExtrabold pb-6 pt-4 text-4xl">You need to create a team first!</h2>
+		<a href="/team"><Button>Goto Team</Button></a>
 	</div>
 {:else if submitted}
 	<div class="flex h-screen items-center justify-center">

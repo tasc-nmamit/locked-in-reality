@@ -10,6 +10,8 @@ export interface TeamData {
 	teamURL: string;
 	teamSecret: string;
 	college?: string;
+	time: number;
+	score: string;
 
 	leader: string;
 	leaderName: string;
