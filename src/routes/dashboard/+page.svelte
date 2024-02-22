@@ -1,29 +1,80 @@
-<!-- <script>
-	import Button from '$lib/components/ui/button/button.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
-	import { user, userData } from '$lib/firebase/firebase';
+<script lang="ts">
+	import { Button } from '$lib/components/ui/custom_button';
+	import * as Table from '$lib/components/ui/table';
+	import { db, user, userID, userProfileData } from '$lib/firebase/firebase';
+	import type { TeamData } from '$lib/types/TeamData';
+	import { Timestamp, arrayUnion, collection, doc, getDoc, getDocs, increment, writeBatch } from 'firebase/firestore';
+	import { onMount } from 'svelte';
 
-	let riddle = '';
-	let hint = '';
-	let key = '';
-	let answer = '';
+	let data: TeamData[] = [];
 
-	function handleClick() {
-		console.log(riddle, hint, key, answer);
+	async function getData() {
+		const teamCollectionRef = collection(db, 'lir');
+		const docSnapshot = await getDocs(teamCollectionRef);
+		const docs = docSnapshot.docs;
+		data = docs.flatMap((doc) => doc.data()) as TeamData[];
+		console.log(data);
+	}
+	const convertAndDownloadCSV = () => {
+		if (data && data.length > 0) {
+			// Create CSV headers
+			const headers = ['Team Name', 'Leader Name', 'Leader Phone', 'Leader Email', 'Score', 'Time'].join(',') + '\n';
+			// Convert data to CSV rows
+			const csvRows = data.map((team) => {
+				const row = [team.teamName, team.leaderName, team.leaderPhone, team.leaderEmail, team.score, team.time].join(',');
+				return row;
+			});
 
+			// Combine headers and rows
+			const csvContent = headers + csvRows.join('\n');
+
+			// Trigger CSV download
+			const blob = new Blob([csvContent], { type: 'text/csv' });
+			const url = window.URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.style.display = 'none';
+			a.href = url;
+			a.download = `LIRList.csv`;
+			document.body.appendChild(a);
+			a.click();
+			window.URL.revokeObjectURL(url);
+		}
+	};
+
+	$: if ($user && $userID && $userProfileData) {
+		getData();
 	}
 </script>
 
-<section class="flex h-screen flex-col gap-4 bg-black text-center">
-	<h1 class="text-3xl">Fill the fucking quiz you fuck!</h1>
-	<p>LIR THEESE NUTS</p>
-
-	<div class="mx-auto flex h-1/3 w-[800px] flex-col gap-y-4 rounded-md bg-white p-10 text-black">
-		<Input type="text" placeholder="The fucking riddle" bind:value={riddle}></Input>
-		<Input type="text" placeholder="The fucking riddle answer" bind:value={answer}></Input>
-		<Input type="text" placeholder="The fucking riddle hint" bind:value={hint}></Input>
-		<Input type="number" placeholder="The fucking riddle key" bind:value={key}></Input>
-	</div>
-
-	<Button on:click={handleClick}>SUBMIT FUCKER</Button>
-</section> -->
+<div class="flex flex-col items-center justify-center p-10 text-center">
+	<h1 class="text-3xl mb-10">Team Details</h1>
+	<Table.Root>
+		<Table.Header>
+			<Table.Row>
+				<Table.Head>S No.</Table.Head>
+				<Table.Head>Team Name</Table.Head>
+				<Table.Head>Leader Name</Table.Head>
+				<Table.Head>Leader Phone</Table.Head>
+				<Table.Head class="text-center">Leader Email</Table.Head>
+				<Table.Head class="text-center">Team ID</Table.Head>
+				<Table.Head class="text-center">Score</Table.Head>
+				<Table.Head class="text-center">Time</Table.Head>
+			</Table.Row>
+		</Table.Header>
+		<Table.Body>
+			{#each data as team, i}
+				<Table.Row class="text-center">
+					<Table.Cell>{i + 1}</Table.Cell>
+					<Table.Cell>{team.teamName}</Table.Cell>
+					<Table.Cell>{team.leaderName}</Table.Cell>
+					<Table.Cell>{team.leaderPhone}</Table.Cell>
+					<Table.Cell>{team.leaderEmail}</Table.Cell>
+					<Table.Cell>{team.teamURL}</Table.Cell>
+					<Table.Cell>{team.score}</Table.Cell>
+					<Table.Cell>{team.time}</Table.Cell>
+				</Table.Row>
+			{/each}
+		</Table.Body>
+	</Table.Root>
+</div>
+<Button on:click={convertAndDownloadCSV} class="flex mx-auto">Download Report</Button>

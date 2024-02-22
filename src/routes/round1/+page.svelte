@@ -20,6 +20,41 @@
 	let dataTeam: TeamData | null = null;
 	let submitted = false;
 
+	let time: string = '';
+	let duration: number;
+
+	function formatTime(seconds: number): string {
+		let hours = Math.floor(seconds / 3600);
+		let minutes = Math.floor((seconds % 3600) / 60);
+		seconds = seconds % 60;
+
+		// @ts-expect-error
+		hours = hours >= 10 ? hours : '0' + hours.toString();
+		// @ts-expect-error
+		minutes = minutes >= 10 ? minutes : '0' + minutes.toString();
+		// @ts-expect-error
+		seconds = seconds >= 10 ? seconds : '0' + seconds.toString();
+
+		let timeStr = `${hours}:${minutes}:${seconds}`;
+
+		return timeStr;
+	}
+
+	function startCountdown() {
+		let remainingTime = duration;
+		const countdownInterval = setInterval(() => {
+			if (remainingTime <= 0) {
+				clearInterval(countdownInterval);
+				localStorage.removeItem('remainingTime');
+				stopTimer();
+			} else {
+				time = formatTime(remainingTime);
+				localStorage.setItem('remainingTime', remainingTime.toString());
+				remainingTime--;
+			}
+		}, 1000);
+	}
+
 	function generateRandomNumber() {
 		const randomNumber = Math.random();
 		const randomNumberInRange = Math.floor(randomNumber * 5) + 1;
@@ -41,15 +76,16 @@
 			submitted = true;
 			localStorage.setItem('submitted', JSON.stringify(submitted));
 		} else {
-			// Do something if OTP doesn't match
 			penaltyTime += 5;
 			localStorage.setItem('penaltyTime', penaltyTime.toString());
 			alert('Unsuccesfull attempt, You are punished');
 		}
 	}
+
 	function startTimer() {
 		startTime = new Date().getTime();
 		localStorage.setItem('startTime', startTime.toString());
+		startCountdown();
 	}
 
 	async function stopTimer() {
@@ -63,7 +99,8 @@
 		const batch = writeBatch(db);
 		console.log(teamRef);
 		batch.update(teamRef, {
-			time: seconds
+			time: seconds,
+			score: score
 		});
 		await batch.commit();
 	}
@@ -111,7 +148,7 @@
 	}
 
 	import type { TeamData } from '$lib/types/TeamData';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	function confirmReload(event: { preventDefault: () => void; returnValue: string }) {
 		event.preventDefault();
@@ -136,6 +173,11 @@
 		if (storedSubmitted) {
 			submitted = JSON.parse(storedSubmitted);
 		}
+
+		duration = parseInt(localStorage.getItem('remainingTime') || '3600');
+		if (isStarted) {
+			startCountdown();
+		}
 		window.addEventListener('beforeunload', confirmReload);
 		return () => {
 			window.removeEventListener('beforeunload', confirmReload);
@@ -144,10 +186,15 @@
 </script>
 
 <div class={`background -z-10 h-screen w-full`}></div>
-{#if !$userData || !$userProfileData}
+{#if !$user}
 	<div class="flex h-full min-h-screen w-full flex-col items-center justify-center">
-		<h2 class="font-jbExtrabold pb-6 pt-4 text-4xl">You need to login and create a team first!</h2>
+		<h2 class="font-jbExtrabold pb-6 pt-4 text-4xl">You need to login!</h2>
 		<a href="/"><Button>Goto Homepage</Button></a>
+	</div>
+{:else if !$userProfileData?.lir}
+	<div class="flex h-full min-h-screen w-full flex-col items-center justify-center">
+		<h2 class="font-jbExtrabold pb-6 pt-4 text-4xl">You need to create a team first!</h2>
+		<a href="/team"><Button>Goto Team</Button></a>
 	</div>
 {:else if submitted}
 	<div class="flex h-screen items-center justify-center">
@@ -156,7 +203,9 @@
 {:else}
 	<section class={`h-screen w-full`}>
 		<!-- <p class="absolute top-0 z-50">{JSON.stringify(data)}</p> -->
-
+		<div class="absolute left-0 top-0 z-20 text-white">
+			{time}
+		</div>
 		{#if !isStarted}
 			<div class="z-20 mx-auto flex flex-col items-center justify-center gap-4">
 				<button
@@ -225,7 +274,7 @@
 						</AlertDialog.Root>
 					</div>
 					<!-- hint alert dialog end -->
-			
+
 					<h1 class="self-start text-left text-xl font-medium">
 						<!-- {currentQuestion + 1}. {data.list[currentQuestion].question} -->
 						<img src={`${questionURLBase}/${currentQuestion + 1}.jpg`} alt="questionImage" class="w-full" />
