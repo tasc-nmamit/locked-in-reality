@@ -5,7 +5,7 @@
         function handleKeyPress(event:any){
             event.preventDefault();
             if (event.key === "Escape"){
-                window.location.href = "serverRoom"
+                window.location.href = '/serverRoom';
             }
         }
 
