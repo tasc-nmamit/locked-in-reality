@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import BouncingDots from '../../chat/BouncingDots.svelte';
 	import { desiredString } from '../desiredString';
 
 	let active = 0;
@@ -10,7 +9,7 @@
 	let inputElement: HTMLInputElement;
 	let textareaValue = ``;
 	let inputValue = '';
-	const chiperCode = "olssv dvysk";
+	const chiperCode = "olssv dvysk"; // chiper == hello world
 
 	function convertString(str: string | any[]){
 		let result = "";
@@ -81,8 +80,6 @@ failed`;
 
     onMount(() => {
         document.addEventListener('keydown', function(event) {
-			console.log(event);
-			
 			if (event.key === 'Tab') {
 				event.preventDefault();
 				changeFocus();
@@ -104,7 +101,6 @@ failed`;
 			} 
         })
     })
-
 </script>
 
 <section class="h-screen w-full cursor-none bg-[#9c9a9d] font-IBM">

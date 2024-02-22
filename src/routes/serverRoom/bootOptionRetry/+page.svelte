@@ -18,10 +18,10 @@
 		{'<UEFI>' : []},
 		{'<Disabled>' : []},
 		]
-	/**
-	 * @type {({ '[S]': string[]; '<UEFI>'?: undefined; '<Disabled>'?: undefined; '<Enabled>'?: undefined; } | { '<UEFI>': string[]; '[S]'?: undefined; '<Disabled>'?: undefined; '<Enabled>'?: undefined; } | { '<Disabled>': string[]; '[S]'?: undefined; '<UEFI>'?: undefined; '<Enabled>'?: undefined; } | { '<Enabled>': string[]; '[S]'?: undefined; '<UEFI>'?: undefined; '<Disabled>'?: undefined; })[]}
-	 */
+	// @ts-ignore
 	let modalStack = [] // contains objects of modal options
+	// copy pop up
+	let showPopUp = false;
 
 	onMount(() => {
 		//@ts-expect-error
@@ -29,8 +29,10 @@
 			event.preventDefault();
 			if (event.key === 'Escape') {
 				if ($showModal[active] === true){
+					// @ts-ignore
 					modalStack.pop();
 					if (modalStack.length > 0) {
+						// @ts-ignore
 						currentModal = modalStack[modalStack.length - 1];
 					} else if (modalStack.length === 0) {
 						$showModal[active] = false;
@@ -60,13 +62,17 @@
 						modalStack.push(tempArrValues[modalIndex]);
 						currentModal = tempArrValues[modalIndex];
 					} else if (typeof(tempArrValues[modalIndex]) === 'string') {
-						// do nothing just copy the  value
-						// test here
+						// do nothing just copy the value
 						if (tempArrValues[modalIndex] === '<Manual Override>') {
 							const valueToCopy = desiredString;
 							navigator.clipboard
 							.writeText(valueToCopy)
-							.then(() => alert(`Value copied`)) // value not shown cuz let the players navigate multiple times in search of the code
+							.then(() => {
+								showPopUp = true;
+								setTimeout(()=>{
+									showPopUp = false;
+								},1000)
+							}) // value not shown cuz let the players navigate multiple times in search of the code
 							.catch((error) => console.error('Unable to copy value:', error));
 						} else {
 							copyToClipBoard();
@@ -75,7 +81,6 @@
 					modalZIndex += 1;
 					modalIndex = 0;
 				} else {
-					//@ts-expect-error
 					modalStack.push(modalOptions[active])
 					$showModal[active] = true;
 				}		
@@ -85,16 +90,14 @@
 		// copy function
 		function copyToClipBoard () {
 			const valueToCopy = randomMessage();
-				// the below message will be copied which is the required code
-				/*
- 				const valueToCopy = `void runFn(){
-     doSomething();
-     return null;
- }`;
- 				*/
 				navigator.clipboard
 					.writeText(valueToCopy)
-					.then(() => alert(`Value copied`)) // value not shown cuz let the players navigate multiple times in search of the code
+					.then(() => {
+						showPopUp = true;
+						setTimeout(()=>{
+							showPopUp = false;
+						},1000)
+					}) // value not shown cuz let the players navigate multiple times in search of the code
 					.catch((error) => console.error('Unable to copy value:', error));
 		}
 
@@ -140,27 +143,17 @@
 		}
 		return arrValues;
 	}
-
-	// Copy alert Modal implementation
-	/*
-	let timeOut = 2000;
-	let showCopyAlert = writable(true);
-	function executeCopyAlert() {
-		// to do
-		showCopyAlert.set(true);
-	}
-	*/
 </script>
 
 <section class="relative h-screen w-full bg-[#9c9a9d] font-IBM cursor-none">
 	{#if $showModal[active]}
 		{#if modalStack.length > 0}
 			<Modal title={title} arrValues={arrValues} {showModal} message={"LOL you are not authorized to change it"} curr={active} />
-		{/if}
+			{/if}
 	{/if}
-	<!-- {#if $showModal[active] && !showCopyAlert}
-			<Modal title={"Warning"} arrValues={[]} showModal message={"Value copied"} curr={active} />
-	{/if} -->
+	{#if showPopUp}		
+		<Modal title={title} arrValues={[]} {showModal} message={"Value copied"} curr={active} />
+	{/if}
 		<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
 		<div class="flex h-20 w-[99%] items-center justify-center border border-x-4 border-white">
 			<h1 class="text-center text-4xl font-medium text-white">System Boot Time Out</h1>

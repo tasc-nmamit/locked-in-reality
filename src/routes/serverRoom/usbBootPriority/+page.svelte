@@ -22,6 +22,9 @@
 	 */
 	let modalStack = [] // contains objects of modal options
 
+	// copy pop up
+	let showPopUp = false;
+
 	onMount(() => {
 		//@ts-expect-error
 		function handleKeyPress(event) {
@@ -75,16 +78,15 @@
 		// copy function
 		function copyToClipBoard () {
 			const valueToCopy = randomMessage();
-				// the below message will be copied which is the required code
-				/*
- 				const valueToCopy = `void runFn(){
-     doSomething();
-     return null;
- }`;
- 				*/
+				
 				navigator.clipboard
 					.writeText(valueToCopy)
-					.then(() => alert(`Value copied`)) // value not shown cuz let the players navigate multiple times in search of the code
+					.then(() => {
+						showPopUp = true;
+						setTimeout(()=>{
+							showPopUp = false;
+						},1000)
+					}) // value not shown cuz let the players navigate multiple times in search of the code
 					.catch((error) => console.error('Unable to copy value:', error));
 		}
 
@@ -148,9 +150,9 @@
 			<Modal title={title} arrValues={arrValues} {showModal} message={"LOL you are not authorized to change it"} curr={active} />
 		{/if}
 	{/if}
-	<!-- {#if $showModal[active] && !showCopyAlert}
-			<Modal title={"Warning"} arrValues={[]} showModal message={"Value copied"} curr={active} />
-	{/if} -->
+	{#if showPopUp}		
+		<Modal title={title} arrValues={[]} {showModal} message={"Value copied"} curr={active} />
+	{/if}
 		<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
 		<div class="flex h-20 w-[99%] items-center justify-center border border-x-4 border-white">
 			<h1 class="text-center text-4xl font-medium text-white">System Boot Time Out</h1>
