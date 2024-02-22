@@ -1,7 +1,7 @@
 <script>
 	let active = 0;
 	const values = ['[S]', '<UEFI>', '<scan>', '<diagnosis>', '<override>', '<reset>', '<options>'];
-	const information = ['All functions on System boot timeout', 'Test System booting', 'change fast boot', 'Diagonise system booting', 'Override booting', 'Reset system booting'];
+	const information = ['All functions on System boot timeout', 'Test System booting', 'change fast boot', 'Diagonise system booting', 'Override booting', 'Reset system booting', 'Advanced Options'];
 	let showModal = writable(new Array(values.length).fill(false));
 
 	import Modal from '$lib/components/LIR/Modal.svelte';

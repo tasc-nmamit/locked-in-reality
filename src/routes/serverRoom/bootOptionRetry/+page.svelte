@@ -141,7 +141,7 @@
 <section class="relative h-screen w-full cursor-none bg-[#9c9a9d] font-IBM">
 	{#if $showModal[active]}
 		{#if modalStack.length > 0}
-			<Modal {title} {arrValues} {showModal} message={'LOL you are not authorized to change it'} curr={active} />
+			<Modal {arrValues} {showModal} message={'LOL you are not authorized to change it'} curr={active} />
 		{/if}
 	{/if}
 	{#if showPopUp}
