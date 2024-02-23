@@ -1,10 +1,9 @@
 // Import the functions you need from the SDKs you need
-import type { ProfileData } from '$lib/types/ProfileData';
 import { deleteApp, getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged, type User } from 'firebase/auth';
 import { doc, getFirestore, onSnapshot } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import { derived, get, writable, type Readable, type Writable } from 'svelte/store';
+import { derived, writable, type Readable } from 'svelte/store';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -12,13 +11,13 @@ import { derived, get, writable, type Readable, type Writable } from 'svelte/sto
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
-	apiKey: 'AIzaSyDkfk7CuVog5P79QgJ5kfONzGr3Rpfi2dU',
-	authDomain: 'tasc-8df79.firebaseapp.com',
-	projectId: 'tasc-8df79',
-	storageBucket: 'tasc-8df79.appspot.com',
-	messagingSenderId: '64049164136',
-	appId: '1:64049164136:web:b18434312a0fa3b5e2b0dd',
-	measurementId: 'G-Q5EYD8MDVW'
+	apiKey: 'AIzaSyCqRkvyNV0scF8Xz5z2a8FiIMHZ0xvCb5I',
+	authDomain: 'lir-tasc.firebaseapp.com',
+	projectId: 'lir-tasc',
+	storageBucket: 'lir-tasc.appspot.com',
+	messagingSenderId: '957183095092',
+	appId: '1:957183095092:web:eef5fb5b731a916c3fb561',
+	measurementId: 'G-GNHZZQCNE9'
 };
 
 // Initialize Firebase
@@ -96,84 +95,19 @@ export function docStore<T>(path: string) {
 
 /* ************************************************************************** */
 
-interface AuthData {
-	user: string;
-}
-
-export const userID: Readable<AuthData | null> = derived(user, ($user, set) => {
-	if ($user) {
-		// console.log('userID updated, now tracking auth/', $user.uid);
-		set({ user: '' });
-		return docStore<AuthData>(`auth/${$user.uid}`).subscribe(set);
-	} else {
-		set(null);
-	}
-});
-
 interface UserData {
-	username: string;
 	name: string;
-	usn: string;
+	phone: string;
+	email: string;
+	team: string;
 }
 
-export const userData: Readable<UserData | null> = derived(userID, ($userID, set) => {
-	if ($userID && $userID.user !== '') {
-		// console.log('userData updated, now tracking user/', $userID.user);
-		return docStore<UserData>(`user/${$userID.user}`).subscribe(set);
+export const userData: Readable<UserData | null> = derived(user, ($user, set) => {
+	if ($user) {
+		return docStore<UserData>(`user/${$user.uid}`).subscribe(set);
 	} else {
 		set(null);
 	}
-});
-
-export const userProfileData: Readable<ProfileData | null> = derived(userID, ($userID, set) => {
-	if ($userID && $userID.user !== '') {
-		return docStore<ProfileData>(`profile/${$userID.user}`).subscribe(set);
-	} else {
-		set(null);
-	}
-});
-
-/* ************************************************************************** */
-
-/** Helper store for userLoaded */
-export const called: Writable<boolean> = writable(false);
-
-/** indicates whether the user (if present) is loaded or is still currently loading */
-export const userLoaded: Writable<boolean> = writable(false);
-
-// userLoaded.subscribe((val) => console.log('userLoaded ' + val));
-// called.subscribe((val) => console.log('called ' + val));
-
-onAuthStateChanged(auth, (user) => {
-	if (!auth || !globalThis.window) {
-		return;
-	}
-	called.set(true);
-	if (user) {
-		userLoaded.set(false);
-	} else {
-		userLoaded.set(true);
-	}
-});
-
-userID.subscribe((value) => {
-	if (!get(called)) {
-		return;
-	}
-
-	if (value && value.user !== '') {
-		userLoaded.set(false);
-	} else {
-		userLoaded.set(true);
-	}
-});
-
-userData.subscribe(() => {
-	if (!get(called)) {
-		return;
-	}
-
-	userLoaded.set(true);
 });
 
 /* ************************************************************************** */
