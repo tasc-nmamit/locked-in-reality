@@ -47,6 +47,9 @@
 				clearInterval(countdownInterval);
 				localStorage.removeItem('remainingTime');
 				stopTimer();
+				alert('Time Up, your score has been recorded!');
+				submitted = true;
+				localStorage.setItem('submitted', JSON.stringify(submitted));
 			} else {
 				time = formatTime(remainingTime);
 				localStorage.setItem('remainingTime', remainingTime.toString());
@@ -76,7 +79,7 @@
 			submitted = true;
 			localStorage.setItem('submitted', JSON.stringify(submitted));
 		} else {
-			penaltyTime += 5;
+			penaltyTime += 120;
 			localStorage.setItem('penaltyTime', penaltyTime.toString());
 			alert('Unsuccesfull attempt, You are punished');
 		}
@@ -139,7 +142,7 @@
 	function handelGetHint() {
 		hintSelected[currentQuestion] = !hintSelected[currentQuestion];
 		hintView = false;
-		penaltyTime += 5;
+		penaltyTime += 120;
 		localStorage.setItem('penaltyTime', penaltyTime.toString());
 	}
 
@@ -235,7 +238,7 @@
 													<AlertDialog.Title class="text-2xl">Attention</AlertDialog.Title>
 												</div>
 												<AlertDialog.Title class="text-lg">Do you want to use hint for this riddle?</AlertDialog.Title>
-												<AlertDialog.Description>The hint will be displayed once and a penalty of 5sec will be imposed</AlertDialog.Description>
+												<AlertDialog.Description>The hint will be displayed once and a penalty of 120sec will be imposed</AlertDialog.Description>
 												<div class="flex w-full flex-row gap-2">
 													<AlertDialog.Cancel class="basis-1/2 hover:bg-[#a527ff]">Close</AlertDialog.Cancel>
 													<Button
