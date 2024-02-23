@@ -4,11 +4,11 @@ export const NAVITEM = [
 		href: '/'
 	},
 	{
-		title: 'Your Team',
-		href: '/team'
+		title: 'Round 1 - Quiz',
+		href: '/round1'
 	},
 	{
-		title: 'Chat',
-		href: '/chat'
+		title: 'Scan',
+		href: '/scan'
 	}
 ];
