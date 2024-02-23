@@ -4,17 +4,27 @@
 	import { Button } from '$lib/components/ui/custom_button';
 	import * as Popover from '$lib/components/ui/custom_popover';
 
-	import { auth, user, userData, userLoaded } from '$lib/firebase/firebase';
-
+	import { auth, user, userData } from '$lib/firebase/firebase';
 	import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 
 	async function signInWithGoogle() {
 		const provider = new GoogleAuthProvider();
-		await signInWithPopup(auth, provider);
-		loggedIn = true;
+		const credential = await signInWithPopup(auth, provider);
+
+		const idToken = await credential.user.getIdToken();
+
+		const res = await fetch('/api/signin', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+				// 'CSRF-Token': csrfToken  // HANDLED by sveltekit automatically
+			},
+			body: JSON.stringify({ idToken })
+		});
 	}
 
 	async function signOutSSR() {
+		const res = await fetch('/api/signin', { method: 'DELETE' });
 		await signOut(auth);
 	}
 
@@ -22,9 +32,7 @@
 </script>
 
 <!-- TODO: wrap everthing in a UserLoadCheck component in the future -->
-{#if !$userLoaded}
-	<span></span>
-{:else if $user && $userData}
+{#if $user && $userData}
 	<Popover.Root>
 		<Popover.Trigger>
 			<Button class="border bg-transparent text-base font-bold text-primary" variant={'secondary'}>You</Button>
@@ -34,31 +42,28 @@
 				<div class="px-2 text-center text-lg">
 					Hello <span class="font-semibold">{$userData.name}</span>
 				</div>
-				<a href="/{$userData.username}" class="contents"> <Button class="border bg-transparent text-primary" variant={'secondary'}>Your Public Profile</Button> </a>
-				<a href="/{$userData.username}/edit" class="contents"><Button class="border bg-transparent text-primary" variant={'secondary'}>Edit Profile</Button></a>
+				<Button class="border bg-transparent text-primary" variant={'secondary'}>You have an account!</Button>
+				<!-- <a href="/{$userData.username}" class="contents"> <Button class="border bg-transparent text-primary" variant={'secondary'}>Your Public Profile</Button> </a>
+				<a href="/{$userData.username}/edit" class="contents"><Button class="border bg-transparent text-primary" variant={'secondary'}>Edit Profile</Button></a> -->
 				<Button on:click={signOutSSR}>Sign out</Button>
 			</div>
 		</Popover.Content>
 	</Popover.Root>
 {:else if $user}
-	{#if loggedIn}
-		{goto('/create-account')}
-	{:else}
-		<Popover.Root>
-			<Popover.Trigger>
-				<Button class="text-lg font-bold duration-200 hover:scale-110" variant="outline">Create Account</Button>
-			</Popover.Trigger>
-			<Popover.Content>
-				<div class="flex max-w-xs flex-col gap-2">
-					<div class="px-2 text-lg">
-						Hello {$user.displayName}, you don't have an account yet!
-					</div>
-					<a href="/create-account" class="contents"><Button variant="outline">Create Account</Button></a>
-					<Button on:click={signOutSSR}>Sign out</Button>
+	<Popover.Root>
+		<Popover.Trigger>
+			<Button class="text-lg font-bold duration-200 hover:scale-110" variant="outline">Create Account</Button>
+		</Popover.Trigger>
+		<Popover.Content>
+			<div class="flex max-w-xs flex-col gap-2">
+				<div class="px-2 text-lg">
+					Hello {$user.displayName}, you don't have an account yet!
 				</div>
-			</Popover.Content>
-		</Popover.Root>
-	{/if}
+				<a href="/create-account" class="contents"><Button variant="outline">Create Account</Button></a>
+				<Button on:click={signOutSSR}>Sign out</Button>
+			</div>
+		</Popover.Content>
+	</Popover.Root>
 {:else}
 	<Popover.Root>
 		<Popover.Trigger>
