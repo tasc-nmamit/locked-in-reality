@@ -41,7 +41,7 @@ compiling ...`;
 		setTimeout(() => {
 			if (convertString(str1) === convertString(desiredString)) {
 				textareaValue += `
-successfull : ${chiperCode}`;
+signature : ${chiperCode}`;
 			} else {
 				textareaValue += `
 failed`;
@@ -149,7 +149,7 @@ failed`;
 				<h3>Boot status : {bootStatus}</h3>
 			</div>
 			<div class="flex w-full justify-center">
-				<h2>To unlock manual <u>Run the code</u></h2>
+				<h2>To unlock manual <u>paste the right code</u></h2>
 			</div>
 			<div class="flex h-[26rem] w-full flex-col items-center justify-center">
 				<textarea id="terminal" cols="30" rows="14" bind:value={textareaValue} bind:this={textareaElement} class="h-3/4 w-2/4 cursor-none resize-none bg-black font-normal" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>

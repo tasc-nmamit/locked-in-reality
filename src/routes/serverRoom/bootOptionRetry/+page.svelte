@@ -1,7 +1,7 @@
 <script>
 	let active = 0;
 	const values = ['[S]', '<UEFI>', '<UEFI>', '<Disabled>', '<Disabled>', 'disabled'];
-	const information = ['All functions on System boot timeout', 'Test System booting', 'change fast boot', 'Diagonise system booting', 'Override booting', 'Reset system booting'];
+	const information = ['All functions on System boot retry', 'Test System booting', 'change fast boot', 'Diagonise system booting', 'Override booting', 'Reset system booting'];
 	let showModal = writable(new Array(values.length).fill(false));
 
 	import Modal from '$lib/components/LIR/Modal.svelte';
@@ -10,7 +10,35 @@
 	import { desiredString } from '../desiredString';
 	import { randomMessage } from '../randomMessage';
 
-	const modalOptions = [{ '[S]': ['Normal Timeout', { '<Test>': ['value one', 'value two'] }, 'Fast Boot', '<Diagnosis log>', '<Manual Override>', 'System Reset'] }, { '<UEFI>': ['safe mode', { 'user mode': ['one', 'two'] }, 'fast mode', 'dev mode'] }, { '<Disabled>': ['System test', 'Server test', 'Diagnosis test'] }, { '<Enabled>': ['Enable', 'Disable'] }, { '<UEFI>': [] }, { '<Disabled>': [] }];
+	const modalOptions = [
+		{ '[S]': [
+			'Normal Timeout', 'Fast Boot', '[Diagnosis log]', '<Manual Override>', 'System Reset'
+			]
+		 }, { '<UEFI>': [
+			'safe mode', 'fast mode', 'dev mode'
+			] 
+		},
+		{
+			'<Disabled>': [
+				'enabled', 'disabled'
+			]
+		},
+		{
+			'<Disabled>': [
+				'enabled', 'disabled'
+			]
+		},
+		{
+			'disabled': [
+				'enabled', 'disabled'
+			]
+		},
+		{
+			'disabled': [
+				'enabled', 'disabled'
+			]
+		}
+	];
 	// @ts-ignore
 	let modalStack = []; // contains objects of modal options
 	// copy pop up
@@ -22,16 +50,11 @@
 			event.preventDefault();
 			if (event.key === 'Escape') {
 				if ($showModal[active] === true) {
-					// @ts-ignore
-					modalStack.pop();
-					if (modalStack.length > 0) {
-						// @ts-ignore
-						currentModal = modalStack[modalStack.length - 1];
-					} else if (modalStack.length === 0) {
-						$showModal[active] = false;
-					}
+					$showModal[active] = false;
+					currentModal = modalOptions[active];
+					modalStack = [];
 					modalIndex = 0;
-					modalZIndex -= 1;
+					modalZIndex = 0;
 				} else {
 					window.location.href = '/serverRoom';
 				}
@@ -54,8 +77,10 @@
 					if (typeof tempArrValues[modalIndex] === 'object') {
 						modalStack.push(tempArrValues[modalIndex]);
 						currentModal = tempArrValues[modalIndex];
+						modalZIndex += 1;
+						modalIndex = 0;
 					} else if (typeof tempArrValues[modalIndex] === 'string') {
-						// do nothing just copy the value
+						// do nothing just copy the  value
 						if (tempArrValues[modalIndex] === '<Manual Override>') {
 							const valueToCopy = desiredString;
 							navigator.clipboard
@@ -67,14 +92,28 @@
 									}, 1000);
 								}) // value not shown cuz let the players navigate multiple times in search of the code
 								.catch((error) => console.error('Unable to copy value:', error));
+								$showModal[active] = false;
+								currentModal = modalOptions[active];
+								modalStack = [];
+								modalIndex = 0;
+								modalZIndex = 0;
+						}else if (tempArrValues[modalIndex] === '[Diagnosis log]') {
+							// to do
+							window.location.href = 'systemBootTimeOut/diagnosis';
 						} else {
 							copyToClipBoard();
+							$showModal[active] = false;
+							currentModal = modalOptions[active];
+							modalStack = [];
+							modalIndex = 0;
+							modalZIndex = 0;
 						}
 					}
-					modalZIndex += 1;
-					modalIndex = 0;
 				} else {
 					modalStack.push(modalOptions[active]);
+					currentModal = modalOptions[active];
+					modalZIndex += 1;
+					modalIndex = 0;
 					$showModal[active] = true;
 				}
 			}
@@ -149,7 +188,7 @@
 	{/if}
 	<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
 		<div class="flex h-20 w-full items-center justify-center border border-x-4 border-white">
-			<h1 class="text-center text-4xl font-medium text-white">System Boot Time Out</h1>
+			<h1 class="text-center text-4xl font-medium text-white">Boot Option Retry</h1>
 		</div>
 	</header>
 	<body class="flex h-[74%] w-full flex-wrap bg-inherit text-3xl font-[600] tracking-normal text-black">

@@ -16,14 +16,7 @@
 					'<Information>': [{ '<System Summary>': [] }, 'Component Information']
 				},
 				{
-					'<Configuration>': [
-						{
-							'<System Configuration>': ['System Settings', { '<Advanced Settings>': [] }]
-						},
-						{
-							'<Peripheral Configuration>': [{ '<Video Output>': [] }, 'CUDA Processing']
-						}
-					]
+					'<Configuration>': [ '<System Configuration>' , '<Advanced Settings>' , '<Video Output>' , 'CUDA Processing']
 				},
 				{ '<Boot>': [] }
 			]
@@ -31,22 +24,19 @@
 		{
 			'[Advanced]': [
 				{
-					'<i-GPU Configuration>': [{ '<Video Memory>': ['1024', '2048', '3072', '4096', { '<Custom Value>': [] }, '[No Limit]'] }, { '<Overclocking>': ['Memory Overclocking', 'Frequency overclocking'] }]
+					'<Memory Configuration>': [ '[Memory Settings]' , 'Auto memory allocation' , '<XMP Profile>']
 				},
 				{
-					'<Memory Configuration>': [{ '[Memory Settings]': [{ '<Custom Memory>': [] }, 'Auto memory allocation'] }, { '<XMP Profile>': 'XMP Profile information' }]
-				},
-				{
-					'<Dedicated GPU Configuration>': [{ '<Video Memory>': ['1024', '2048', '3072', '4096', { '<Custom Value>': [] }, 'No Limit'] }, { '<Overclocking>': ['Memory Overclocking', 'Frequency overclocking'] }]
+					'<Dedicated GPU Configuration>': [ '<Video Memory>' , { '<Custom Value>': [] } , '<Overclocking>']
 				}
 			]
 		},
 		{
-			'<Cooling Configuration>': [{ '<Fan Configuration>': ['Auto', { '[Manual]': [] }] }, { '<Fan Speed>': ['Low', 'Medium', 'High', { '<custom>': [] }] }, { '<Fan Curve>': [{ '[Custom]': [] }, 'Predefined', 'profile 1', 'profile 2'] }, { '<Temperature>': ['Celsius', 'Fahrenheit', 'Kelvin', { '<custom>': [] }] }]
+			'<Cooling Configuration>': [ '<Fan Configuration>' , '<Fan Speed>' , '<Fan Curve>' , '<Temperature>' ]
 		}
 		// Add more sections as needed
 	];
-	// @ts-expect-error
+
 	let modalStack = []; // contains objects of modal options
 
 	let showPopUp = false;
@@ -57,16 +47,11 @@
 			event.preventDefault();
 			if (event.key === 'Escape') {
 				if ($showModal[active] === true) {
-					// @ts-ignore
-					modalStack.pop();
-					if (modalStack.length > 0) {
-						// @ts-ignore
-						currentModal = modalStack[modalStack.length - 1];
-					} else if (modalStack.length === 0) {
-						$showModal[active] = false;
-					}
+					$showModal[active] = false;
+					currentModal = modalOptions[active];
+					modalStack = [];
 					modalIndex = 0;
-					modalZIndex -= 1;
+					modalZIndex = 0;
 				} else {
 					window.location.href = '/serverRoom';
 				}
@@ -87,19 +72,29 @@
 			} else if (event.key === 'Enter') {
 				if ($showModal[active]) {
 					if (typeof tempArrValues[modalIndex] === 'object') {
-						// @ts-ignore
 						modalStack.push(tempArrValues[modalIndex]);
-						// @ts-ignore
 						currentModal = tempArrValues[modalIndex];
+						modalZIndex += 1;
+						modalIndex = 0;
 					} else if (typeof tempArrValues[modalIndex] === 'string') {
 						// do nothing just copy the  value
-						copyToClipBoard();
+						if (tempArrValues[modalIndex] === '[Diagnosis log]') {
+							// to do
+							window.location.href = 'systemBootTimeOut/diagnosis';
+						} else {
+							copyToClipBoard();
+							$showModal[active] = false;
+							currentModal = modalOptions[active];
+							modalStack = [];
+							modalIndex = 0;
+							modalZIndex = 0;
+						}
 					}
+				} else {
+					modalStack.push(modalOptions[active]);
+					currentModal = modalOptions[active];
 					modalZIndex += 1;
 					modalIndex = 0;
-				} // @ts-ignore
-				else {
-					modalStack.push(modalOptions[active]);
 					$showModal[active] = true;
 				}
 			}

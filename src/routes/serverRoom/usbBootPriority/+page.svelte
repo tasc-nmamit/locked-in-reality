@@ -1,7 +1,7 @@
 <script>
 	let active = 0;
-	const values = ['[S]', '<UEFI>', '<UEFI>', '<Disabled>', '<Disabled>', 'disabled'];
-	const information = ['All functions on System boot timeout', 'Test System booting', 'change fast boot', 'Diagonise system booting', 'Override booting', 'Reset system booting'];
+	const values = ['[S]', '<scan>', '<override>','<reset>','<change>'];
+	const information = ['Set Boot Mode for the server', 'Scan system drives for errors', 'Override Boot drives', 'Reset Boot drives', 'Change Boot drive'];
 	let showModal = writable(new Array(values.length).fill(false));
 
 	import Modal from '$lib/components/LIR/Modal.svelte';
@@ -9,10 +9,28 @@
 	import { writable } from 'svelte/store';
 	import { randomMessage } from '../randomMessage';
 
-	const modalOptions = [{ '[S]': ['Normal Timeout', { '<Test>': ['value one', 'value two'] }, 'Fast Boot', '<Diagnosis log>', '<Manual Override>', 'System Reset'] }, { '<UEFI>': ['safe mode', { 'user mode': ['one', 'two'] }, 'fast mode', 'dev mode'] }, { '<Disabled>': ['System test', 'Server test', 'Diagnosis test'] }, { '<Enabled>': ['Enable', 'Disable'] }, { '<UEFI>': [] }, { '<Disabled>': [] }];
-	/**
-	 * @type {({ '[S]': string[]; '<UEFI>'?: undefined; '<Disabled>'?: undefined; '<Enabled>'?: undefined; } | { '<UEFI>': string[]; '[S]'?: undefined; '<Disabled>'?: undefined; '<Enabled>'?: undefined; } | { '<Disabled>': string[]; '[S]'?: undefined; '<UEFI>'?: undefined; '<Enabled>'?: undefined; } | { '<Enabled>': string[]; '[S]'?: undefined; '<UEFI>'?: undefined; '<Disabled>'?: undefined; })[]}
-	 */
+	const modalOptions = [
+		{ '<UEFI>': 
+			[
+				'<safe mode>' , 'fast mode', 'dev mode'
+			]
+		}, { 
+			'<scan>': ['System test', 'Server test', 'Diagnosis test' , 'Drive test'] 
+		}, {
+			'<override>': ['Enable', 'Disable'] 
+		},
+		{
+			'<reset>': ['Reset Boot drive', 'Reset System boot']
+		},
+		{
+			'<change>': [
+				'<Change Boot drive>' ,
+				'<Change System boot>' 
+			]
+		}
+	];
+
+	// @ts-ignore
 	let modalStack = []; // contains objects of modal options
 
 	// copy pop up
@@ -24,14 +42,11 @@
 			event.preventDefault();
 			if (event.key === 'Escape') {
 				if ($showModal[active] === true) {
-					modalStack.pop();
-					if (modalStack.length > 0) {
-						currentModal = modalStack[modalStack.length - 1];
-					} else if (modalStack.length === 0) {
-						$showModal[active] = false;
-					}
+					$showModal[active] = false;
+					currentModal = modalOptions[active];
+					modalStack = [];
 					modalIndex = 0;
-					modalZIndex -= 1;
+					modalZIndex = 0;
 				} else {
 					window.location.href = '/serverRoom';
 				}
@@ -54,15 +69,27 @@
 					if (typeof tempArrValues[modalIndex] === 'object') {
 						modalStack.push(tempArrValues[modalIndex]);
 						currentModal = tempArrValues[modalIndex];
+						modalZIndex += 1;
+						modalIndex = 0;
 					} else if (typeof tempArrValues[modalIndex] === 'string') {
 						// do nothing just copy the  value
-						copyToClipBoard();
+						if (tempArrValues[modalIndex] === '[Diagnosis log]') {
+							// to do
+							window.location.href = 'systemBootTimeOut/diagnosis';
+						} else {
+							copyToClipBoard();
+							$showModal[active] = false;
+							currentModal = modalOptions[active];
+							modalStack = [];
+							modalIndex = 0;
+							modalZIndex = 0;
+						}
 					}
+				} else {
+					modalStack.push(modalOptions[active]);
+					currentModal = modalOptions[active];
 					modalZIndex += 1;
 					modalIndex = 0;
-				} else {
-					//@ts-expect-error
-					modalStack.push(modalOptions[active]);
 					$showModal[active] = true;
 				}
 			}
@@ -125,16 +152,6 @@
 		}
 		return arrValues;
 	}
-
-	// Copy alert Modal implementation
-	/*
-	let timeOut = 2000;
-	let showCopyAlert = writable(true);
-	function executeCopyAlert() {
-		// to do
-		showCopyAlert.set(true);
-	}
-	*/
 </script>
 
 <section class="relative h-screen w-full cursor-none bg-[#9c9a9d] font-IBM">
@@ -148,17 +165,16 @@
 	{/if}
 	<header class="flex h-[10%] w-full items-center justify-center bg-[#000069]">
 		<div class="flex h-20 w-full items-center justify-center border border-x-4 border-white">
-			<h1 class="text-center text-4xl font-medium text-white">System Boot Time Out</h1>
+			<h1 class="text-center text-4xl font-medium text-white">USB Boot Priority</h1>
 		</div>
 	</header>
 	<body class="flex h-[74%] w-full flex-wrap bg-inherit text-3xl font-[600] tracking-normal text-black">
 		<div class="flex basis-1/3 flex-col gap-y-4 p-10">
-			<p>Functions</p>
-			<p>Test</p>
 			<p>Fast Boot</p>
 			<p>Diagnosis Scan</p>
 			<p>Manual Override</p>
-			<p>System Reset</p>
+			<p>Boot drive Reset</p>
+			<p>Change Boot drive</p>
 		</div>
 		<div class="boot-options flex basis-1/3 flex-col gap-y-4 p-10">
 			{#each values as key, index}
