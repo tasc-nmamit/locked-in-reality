@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/custom_button';
 	import * as Table from '$lib/components/ui/table';
-	import { db, user, userID, userProfileData } from '$lib/firebase/firebase';
-	import type { TeamData } from '$lib/types/TeamData';
+	import { db, user, userData } from '$lib/firebase/firebase';
+
 	import { Timestamp, arrayUnion, collection, doc, getDoc, getDocs, increment, writeBatch } from 'firebase/firestore';
 	import { onMount } from 'svelte';
 
-	let data: TeamData[] = [];
+	let data = [];
 
 	async function getData() {
 		const teamCollectionRef = collection(db, 'lir');
 		const docSnapshot = await getDocs(teamCollectionRef);
 		const docs = docSnapshot.docs;
-		data = docs.flatMap((doc) => doc.data()) as TeamData[];
+		data = docs.flatMap((doc) => doc.data());
 		console.log(data);
 	}
 	const convertAndDownloadCSV = () => {
@@ -41,13 +41,13 @@
 		}
 	};
 
-	$: if ($user && $userID && $userProfileData) {
+	$: if ($user && $userData) {
 		getData();
 	}
 </script>
 
 <div class="flex flex-col items-center justify-center p-10 text-center">
-	<h1 class="text-3xl mb-10">Team Details</h1>
+	<h1 class="mb-10 text-3xl">Team Details</h1>
 	<Table.Root>
 		<Table.Header>
 			<Table.Row>
@@ -77,4 +77,4 @@
 		</Table.Body>
 	</Table.Root>
 </div>
-<Button on:click={convertAndDownloadCSV} class="flex mx-auto">Download Report</Button>
+<Button on:click={convertAndDownloadCSV} class="mx-auto flex">Download Report</Button>
