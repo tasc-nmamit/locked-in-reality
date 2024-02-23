@@ -6,6 +6,8 @@
 	import { Html5Qrcode } from 'html5-qrcode';
 	import { onMount } from 'svelte';
 	import { Label } from '$lib/components/ui/label';
+	import { arrayUnion, doc, writeBatch } from 'firebase/firestore';
+	import { db } from '$lib/firebase/firebase';
 
 	const teamList = ['Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5'];
 	let teamID: { value: string; label: string } = { value: '', label: '' };
@@ -61,33 +63,23 @@
 		}
 
 		console.log('decoded Text', decodedText, 'decoded Result', decodedResult);
-		// await updateStatus(decodedText);
+		await updateStatus(decodedText);
 	}
 
-	// async function updateStatus(decodedText: string) {
-	// 	const data = JSON.parse(decodedText);
-	// 	// console.log(data);
+	async function updateStatus(decodedText: string) {
+		const team: string = teamID.value;
+		const info: string = decodedText;
 
-	// 	const team: string = data.team;
-	// 	const user: string = data.user;
+		const batch = writeBatch(db);
+		const teamRef = doc(db, 'lirqr', team);
 
-	// 	const batch = writeBatch(db);
-	// 	const teamRef = doc(db, 'snh2023final', team);
+		batch.update(teamRef, {
+			scanned: arrayUnion(info)
+		});
 
-	// 	batch.update(teamRef, {
-	// 		arrived: true,
-	// 		[user + '.status']: status,
-	// 		[user + '.timestamp']: Timestamp.now(),
-	// 		[user + '.scanned']: true,
-	// 		[user + '_history']: arrayUnion({
-	// 			status: status,
-	// 			timestamp: Timestamp.now()
-	// 		})
-	// 	});
-
-	// 	await batch.commit();
-	// 	alert('Status updated');
-	// }
+		await batch.commit();
+		alert('Status updated');
+	}
 
 	function onScanFailure(error: any) {
 		console.warn(`Code scan error = ${error}`);
