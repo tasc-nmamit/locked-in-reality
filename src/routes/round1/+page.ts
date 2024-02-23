@@ -25,12 +25,13 @@ function rg(n: number) {
 }
 
 export const load: PageLoad = async () => {
-	const docRef = doc(db, 'quiz', 'nmZLhL8mlFRvulElpgPA');
+	const docRef = doc(db, 'quiz', 'wHjUi51A3Aq52SJ2IqHL');
 	const docSnap = await getDoc(docRef);
 
 	if (docSnap.exists()) {
 		const list = docSnap.data().questions;
-		// console.log(list);
+
+		// console.log(list, list[0], list.length);
 		const answers = [];
 
 		for (let i = 0; i < list.length; i++) {

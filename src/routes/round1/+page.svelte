@@ -2,7 +2,7 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import { db, user, userData, userProfileData } from '$lib/firebase/firebase';
+	import { db, user, userData } from '$lib/firebase/firebase';
 	import Icon from '@iconify/svelte';
 	import type { PageData } from './$types';
 
@@ -93,7 +93,7 @@
 		const timeDiff = endTime - startTime;
 		let seconds = Math.floor(timeDiff / 1000);
 		seconds += penaltyTime;
-		let teamURL = $userProfileData?.lir;
+		let teamURL = $userData?.team;
 		//@ts-ignore
 		const teamRef = doc(db, 'lir', teamURL);
 		const batch = writeBatch(db);
@@ -147,7 +147,6 @@
 		redirect(300, path);
 	}
 
-	import type { TeamData } from '$lib/types/TeamData';
 	import { onDestroy, onMount } from 'svelte';
 
 	function confirmReload(event: { preventDefault: () => void; returnValue: string }) {
@@ -190,11 +189,6 @@
 	<div class="flex h-full min-h-screen w-full flex-col items-center justify-center">
 		<h2 class="font-jbExtrabold pb-6 pt-4 text-4xl">You need to login!</h2>
 		<a href="/"><Button>Goto Homepage</Button></a>
-	</div>
-{:else if !$userProfileData?.lir}
-	<div class="flex h-full min-h-screen w-full flex-col items-center justify-center">
-		<h2 class="font-jbExtrabold pb-6 pt-4 text-4xl">You need to create a team first!</h2>
-		<a href="/team"><Button>Goto Team</Button></a>
 	</div>
 {:else if submitted}
 	<div class="flex h-screen items-center justify-center">
