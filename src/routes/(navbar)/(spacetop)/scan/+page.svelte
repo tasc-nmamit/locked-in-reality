@@ -140,7 +140,7 @@
 		<Card.Content>
 			{#if info && info['key'] && info['text']}
 				<div class="space-y-2">
-					<p class="text-lg font-semibold">Key -> {info['key']}</p>
+					<!-- <p class="text-lg font-semibold">Key -> {info['key']}</p> -->
 					<p class="text-lg font-semibold">{info['text']}</p>
 				</div>
 			{:else if info}
