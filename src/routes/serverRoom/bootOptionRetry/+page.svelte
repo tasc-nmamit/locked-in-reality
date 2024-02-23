@@ -10,7 +10,35 @@
 	import { desiredString } from '../desiredString';
 	import { randomMessage } from '../randomMessage';
 
-	const modalOptions = [{ '[S]': ['Normal Timeout', { '<Test>': ['value one', 'value two'] }, 'Fast Boot', '[Diagnosis log]', '<Manual Override>', 'System Reset'] }, { '<UEFI>': ['safe mode', { 'user mode': ['one', 'two'] }, 'fast mode', 'dev mode'] }, { '<Disabled>': ['System test', 'Server test', 'Diagnosis test'] }, { '<Enabled>': ['Enable', 'Disable'] }, { '<UEFI>': [] }, { '<Disabled>': [] }];
+	const modalOptions = [
+		{ '[S]': [
+			'Normal Timeout', 'Fast Boot', '[Diagnosis log]', '<Manual Override>', 'System Reset'
+			]
+		 }, { '<UEFI>': [
+			'safe mode', 'fast mode', 'dev mode'
+			] 
+		},
+		{
+			'<Disabled>': [
+				'enabled', 'disabled'
+			]
+		},
+		{
+			'<Disabled>': [
+				'enabled', 'disabled'
+			]
+		},
+		{
+			'disabled': [
+				'enabled', 'disabled'
+			]
+		},
+		{
+			'disabled': [
+				'enabled', 'disabled'
+			]
+		}
+	];
 	// @ts-ignore
 	let modalStack = []; // contains objects of modal options
 	// copy pop up

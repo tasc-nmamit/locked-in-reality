@@ -12,10 +12,7 @@
 	const modalOptions = [
 		{ '<UEFI>': 
 			[
-				'<safe mode>', { 
-					'user mode': ['quick', 'full'] 
-				}, 
-				'fast mode', 'dev mode'
+				'<safe mode>' , 'fast mode', 'dev mode'
 			]
 		}, { 
 			'<scan>': ['System test', 'Server test', 'Diagnosis test' , 'Drive test'] 
@@ -27,8 +24,8 @@
 		},
 		{
 			'<change>': [
-				{'<Change Boot drive>' : ['drive 1' , 'drive 2']}, 
-				{'<Change System boot>' : ['drive 1' , 'drive 2']}
+				'<Change Boot drive>' ,
+				'<Change System boot>' 
 			]
 		}
 	];

@@ -11,10 +11,10 @@
 
 	const modalOptions = [
 		{
-			'[S]': ['Normal Timeout', { '<Test>': ['Manual Test', 'Automatic test', 'semi-automatic test'] }, 'Fast Boot', '[Diagnosis log]', { '<Manual Override>': [] }, { 'System Reset': [] }]
+			'[S]': ['Normal Timeout', { '<Test>': ['Manual Test', 'Automatic test'] },  '[Diagnosis log]', { 'Manual Override': [] }]
 		},
 		{
-			'<UEFI>': ['safe mode', { '<user mode>': ['admin', 'user'] }, 'fast mode', 'dev mode']
+			'<UEFI>': ['safe mode', 'user mode' , 'fast mode', 'dev mode']
 		},
 		{
 			'<scan>': ['System test', 'Server test', 'Diagnosis test']
@@ -31,13 +31,10 @@
 		{
 			'<options>': [
 				{
-					'<Fast Boot>': [{ 'Quick Boot': ['Enabled', 'Disabled'] }, { 'Turbo Boot': ['Enabled', 'Disabled'] }]
+					'<Fast Boot>': ['Quick Boot' , 'Turbo Boot']
 				},
 				{
-					'<Normal Boot>': [{ 'Verbose Boot': ['Enabled', 'Disabled'] }, { 'Diagnostic Boot': ['Enabled', 'Disabled'] }]
-				},
-				{
-					'<Safe Boot>': [{ 'Minimal Boot': ['Enabled', 'Disabled'] }, { 'Network Boot': ['Enabled', 'Disabled'] }]
+					'<Safe Boot>': ['Minimal Boot', 'Network Boot']
 				}
 			]
 		}

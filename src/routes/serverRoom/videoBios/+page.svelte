@@ -16,14 +16,7 @@
 					'<Information>': [{ '<System Summary>': [] }, 'Component Information']
 				},
 				{
-					'<Configuration>': [
-						{
-							'<System Configuration>': ['System Settings', { '<Advanced Settings>': [] }]
-						},
-						{
-							'<Peripheral Configuration>': [{ '<Video Output>': [] }, 'CUDA Processing']
-						}
-					]
+					'<Configuration>': [ '<System Configuration>' , '<Advanced Settings>' , '<Video Output>' , 'CUDA Processing']
 				},
 				{ '<Boot>': [] }
 			]
@@ -31,18 +24,15 @@
 		{
 			'[Advanced]': [
 				{
-					'<i-GPU Configuration>': [{ '<Video Memory>': ['1024', '2048', '3072', '4096', { '<Custom Value>': [] }, '[No Limit]'] }, { '<Overclocking>': ['Memory Overclocking', 'Frequency overclocking'] }]
+					'<Memory Configuration>': [ '[Memory Settings]' , 'Auto memory allocation' , '<XMP Profile>']
 				},
 				{
-					'<Memory Configuration>': [{ '[Memory Settings]': [{ '<Custom Memory>': [] }, 'Auto memory allocation'] }, { '<XMP Profile>': 'XMP Profile information' }]
-				},
-				{
-					'<Dedicated GPU Configuration>': [{ '<Video Memory>': ['1024', '2048', '3072', '4096', { '<Custom Value>': [] }, 'No Limit'] }, { '<Overclocking>': ['Memory Overclocking', 'Frequency overclocking'] }]
+					'<Dedicated GPU Configuration>': [ '<Video Memory>' , { '<Custom Value>': [] } , '<Overclocking>']
 				}
 			]
 		},
 		{
-			'<Cooling Configuration>': [{ '<Fan Configuration>': ['Auto', { '[Manual]': [] }] }, { '<Fan Speed>': ['Low', 'Medium', 'High', { '<custom>': [] }] }, { '<Fan Curve>': [{ '[Custom]': [] }, 'Predefined', 'profile 1', 'profile 2'] }, { '<Temperature>': ['Celsius', 'Fahrenheit', 'Kelvin', { '<custom>': [] }] }]
+			'<Cooling Configuration>': [ '<Fan Configuration>' , '<Fan Speed>' , '<Fan Curve>' , '<Temperature>' ]
 		}
 		// Add more sections as needed
 	];

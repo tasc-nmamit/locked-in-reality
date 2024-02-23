@@ -41,7 +41,7 @@ compiling ...`;
 		setTimeout(() => {
 			if (convertString(str1) === convertString(desiredString)) {
 				textareaValue += `
-successfull : ${chiperCode}`;
+signature : ${chiperCode}`;
 			} else {
 				textareaValue += `
 failed`;
