@@ -9,7 +9,7 @@
 	import { arrayUnion, doc, writeBatch } from 'firebase/firestore';
 	import { db } from '$lib/firebase/firebase';
 
-	const teamList = ['Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5'];
+	const teamList = ['Team_1', 'Team_2', 'Team_3', 'Team_4', 'Team_5'];
 	let teamID: { value: string; label: string } = { value: '', label: '' };
 
 	let scanning = false;
@@ -67,6 +67,7 @@
 	}
 
 	async function updateStatus(decodedText: string) {
+		// alert('trying to update status');
 		const team: string = teamID.value;
 		const info: string = decodedText;
 
